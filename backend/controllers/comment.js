@@ -1,9 +1,9 @@
 const expressAsync = require("express-async-handler");
 const Comment = require("../models/commentModel");
-const { findById } = require("../models/userModel");
+const User = require("../models/userModel");
 
 const commentAdd = expressAsync(async (req, res) => {
-  const { comment } = req.body;
+  const { comment, id } = req.body;
   if (!comment) {
     return res.status(402).json({
       message: "Please add comment",
@@ -25,13 +25,10 @@ const commentAdd = expressAsync(async (req, res) => {
 const commentdelete = expressAsync(async (req, res) => {
   const { id } = req.body;
   try {
-    // Find the comment by id and delete it
     const comment = await Comment.findByIdAndDelete(id);
-
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
     }
-
     res.status(200).json({ message: "Comment deleted successfully", comment });
   } catch (error) {
     res
@@ -42,32 +39,34 @@ const commentdelete = expressAsync(async (req, res) => {
 
 const updatecomment = expressAsync(async (req, res) => {
   const { id, newComment } = req.body;
+
   try {
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { text: newComment },
+      { new: true }
+    );
+
     if (!comment) {
-      return res.status(404).json({
-        message: "comment not found",
-      });
+      return res.status(404).json({ message: "Comment not found" });
     }
-    res.status(200).json({ message: "Comment updated successfully" });
+    res.status(200).json({ message: "Comment updated successfully", comment });
   } catch (error) {
-    res.status(500).json({ message: "error in updating the comment" });
+    res
+      .status(500)
+      .json({ message: "Error in updating the comment", error: error.message });
   }
-  const comment = await findByIdAndUpdate(
-    id,
-    { text: newComment },
-    { new: true }
-  );
 });
 
 const likecomment = expressAsync(async (req, res) => {
   const { id } = req.body;
   try {
-    const comment = await findById(id);
+    const comment = await Comment.findById(id);
     if (!comment) {
-      return res.status(405).json({ message: "comment not found" });
+      return res.status(405).json({ message: "Comment not found" });
     }
-    Comment.likes.push(req.user._id);
-    await Comment.save();
+    comment.likes.push(req.user._id);
+    await comment.save();
     res.status(200).json({ message: "Comment liked successfully", comment });
   } catch (error) {
     res
@@ -76,4 +75,4 @@ const likecomment = expressAsync(async (req, res) => {
   }
 });
 
-module.exports={commentAdd,commentdelete,updatecomment,likecomment}
+module.exports = { commentAdd, commentdelete, updatecomment, likecomment };

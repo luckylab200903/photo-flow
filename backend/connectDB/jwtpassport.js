@@ -1,6 +1,6 @@
 const JwtStrategy = require("passport-jwt").Strategy,
   ExtractJwt = require("passport-jwt").ExtractJwt;
-const User = require("../model/userModel.js");
+const User = require("../models/userModel.js");
 const passport = require("passport");
 const jwtpassport = () => {
   var opts = {};
@@ -8,7 +8,7 @@ const jwtpassport = () => {
   opts.secretOrKey = process.env.SECRET;
   passport.use(
     new JwtStrategy(opts, function (jwt_payload, done) {
-      console.log(jwt_payload);
+      //console.log(jwt_payload);
       User.findOne({ _id: jwt_payload.identifier })
         .exec()
         .then((user) => {
