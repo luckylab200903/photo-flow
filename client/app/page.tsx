@@ -1,17 +1,24 @@
 "use client";
-import Image from "next/image";
+import { counterSlice } from "@/lib/features/countSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useState } from "react";
 
 export default function Home() {
-  const [file, setFile] = useState(null);
-
-  const handleFile = (e) => {
-    console.log(e.target.value);
-  };
+  const dispatch = useAppDispatch();
+  const { value, status } = useAppSelector((state) => state.counter);
 
   return (
     <div>
-      <input type="file" onChange={handleFile} />
+      <button
+        onClick={() => {
+          dispatch(counterSlice.actions.increment());
+          console.log("increment");
+        }}
+      >
+        Hello
+      </button>
+      <p>{value}</p>
+      <p>{status}</p>
     </div>
   );
 }
