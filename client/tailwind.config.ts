@@ -2,18 +2,18 @@ import type { Config } from "tailwindcss";
 
 const config = {
   content: [
-    "./components/ui/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
   ],
   theme: {
     extend:{
     colors: {
       surface: "#c2506e",
-      muted: "#fcbfda",
-      overlay: "#fdf0f5",
+      muted: "#fb88bb",
+      overlay: "#ffe0e8",
       light: "#ffffff",
       dark: "#000000",
-      gray: "#f7f6f9",
+      gray: "#eee",
     },
     },
   },
