@@ -1,34 +1,75 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
-
+import Cookies from 'js-cookie';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { makeAuthenticatedPOSTRequest } from "../../lib/utils";
 
+import { useRouter } from 'next/navigation'
+import { useCookies } from "react-cookie";
 export default function Signin() {
   const dispatch = useAppDispatch();
-
+  const router = useRouter()
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { loading, isAuth, error } = useAppSelector((state) => state.user);
-
+  //const [cookies,setCookies]=useCookies(["cookie"])
+  const [token, setToken] = useState('');
   const [user, setUser] = useState({
-    fullname:"",
+    username: "",
+    firstname: "",
+    lastname: "",
     email: "",
     password: "",
-    cpassword:"",
+    cpassword: "",
   });
+  useEffect(() => {
+    const token = Cookies.get('token');
+    if (token) {
+      router.push('/'); 
+    }
+  }, [router]);
+  const handlePostrequest = async (e: any) => {
+    e.preventDefault();
+    console.log("happening");
+    if (user.password !== user.cpassword) {
+      alert("Password and confirm password do not match");
+      return;
+    }
+    const data = {
+      username: user.username,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+      password: user.password,
+      cpassword: user.cpassword,
+    };
+    try {
+      const response = await makeAuthenticatedPOSTRequest("/signup", data);
+      if (response && response.token) {
+        const receivedToken = response.token;
+        
+        setToken(receivedToken);
+        console.log("Response from signup:", response);
+        // Send the token to the server for storage
+        //setCookies("name", response.token, { path: "/" });
+        Cookies.set('token', receivedToken, { expires: 7 }); // Cookie expires in 7 days
 
-  async function onSubmit(event) {
-    event.preventDefault();
-    // await dispatch(loginUser(user.email, user.password));
-  }
+        router.push("/");
+      } else {
+        console.log("api failure");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error (e.g., show error message to the user)
+    }
+  };
 
   // useEffect(() => {
   //   if (isAuthenticated && user.email === import.meta.env.VITE_ADMIN_EMAIL)
@@ -56,7 +97,7 @@ export default function Signin() {
             href="/signin"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-24 top-4 md:right-24 md:top-8",
+              "absolute right-24 top-4 md:right-24 md:top-8"
             )}
           >
             Sign in
@@ -65,7 +106,7 @@ export default function Signin() {
             href="/"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-4 top-4 md:right-8 md:top-8",
+              "absolute right-4 top-4 md:right-8 md:top-8"
             )}
           >
             <svg
@@ -98,17 +139,55 @@ export default function Signin() {
                       className="text-md font-bold text-black"
                       htmlFor="fullname"
                     >
-                      Full Name
+                      User Name
                     </Label>
                     <Input
                       required
-                      id="fullname"
+                      id="username"
                       className="mb-3 text-surface"
-                      value={user.fullname}
+                      value={user.username}
                       onChange={(event) =>
-                        setUser({ ...user, fullname: event.target.value })
+                        setUser({ ...user, username: event.target.value })
                       }
-                      placeholder="my name is..."
+                      placeholder="Username..."
+                      type="text"
+                      autoCorrect="off"
+                      disabled={loading}
+                    />
+                    <Label
+                      className="text-md font-bold text-black"
+                      htmlFor="First name"
+                    >
+                      First Name
+                    </Label>
+                    <Input
+                      required
+                      id="firstname"
+                      className="mb-3 text-surface"
+                      value={user.firstname}
+                      onChange={(event) =>
+                        setUser({ ...user, firstname: event.target.value })
+                      }
+                      placeholder="First name..."
+                      type="text"
+                      autoCorrect="off"
+                      disabled={loading}
+                    />
+                    <Label
+                      className="text-md font-bold text-black"
+                      htmlFor="fullname"
+                    >
+                      Last Name
+                    </Label>
+                    <Input
+                      required
+                      id="lastname"
+                      className="mb-3 text-surface"
+                      value={user.lastname}
+                      onChange={(event) =>
+                        setUser({ ...user, lastname: event.target.value })
+                      }
+                      placeholder="Lastname..."
                       type="text"
                       autoCorrect="off"
                       disabled={loading}
@@ -135,118 +214,122 @@ export default function Signin() {
                       disabled={loading}
                     />
                   </div>
-                    <div className="relative">
-                      <Label className="text-md font-bold " htmlFor="password">
-                        Your password
-                      </Label>
-                      <Input
-                        required
-                        className="mb-3 text-surface"
-                        value={user.password}
-                        onChange={(event) =>
-                          setUser({ ...user, password: event.target.value })
-                        }
-                        id="password"
-                        placeholder="verystrongpassword"
-                        type={passwordVisible ? "text" : "password"}
-                        autoCapitalize="none"
-                        autoComplete="new-password"
-                        autoCorrect="off"
-                        disabled={loading}
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPasswordVisible(!passwordVisible);
-                        }}
-                        role="button"
-                        className="absolute bottom-5 right-3"
+                  <div className="relative">
+                    <Label className="text-md font-bold " htmlFor="password">
+                      Your password
+                    </Label>
+                    <Input
+                      required
+                      className="mb-3 text-surface"
+                      value={user.password}
+                      onChange={(event) =>
+                        setUser({ ...user, password: event.target.value })
+                      }
+                      id="password"
+                      placeholder="verystrongpassword"
+                      type={passwordVisible ? "text" : "password"}
+                      autoCapitalize="none"
+                      autoComplete="new-password"
+                      autoCorrect="off"
+                      disabled={loading}
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPasswordVisible(!passwordVisible);
+                      }}
+                      role="button"
+                      className="absolute bottom-5 right-3"
+                    >
+                      <svg
+                        className="h-6 w-6 stroke-surface"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
                       >
-                        <svg
-                          className="h-6 w-6 stroke-surface"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          {passwordVisible ? (
-                            <>
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </>
-                          ) : (
+                        {passwordVisible ? (
+                          <>
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
                             />
-                          )}
-                        </svg>
-                      </button>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </>
+                        ) : (
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                          />
+                        )}
+                      </svg>
+                    </button>
                   </div>
-                    <div className="relative">
-                      <Label className="text-md font-bold " htmlFor="cpassword">
-                        Confirm password
-                      </Label>
-                      <Input
-                        required
-                        className="mb-3 text-surface"
-                        value={user.cpassword}
-                        onChange={(event) =>
-                          setUser({ ...user, cpassword: event.target.value })
-                        }
-                        id="cpassword"
-                        placeholder="verystrongpassword"
-                        type={passwordVisible ? "text" : "password"}
-                        autoCapitalize="none"
-                        autoCorrect="off"
-                        disabled={loading}
-                      />
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPasswordVisible(!passwordVisible);
-                        }}
-                        role="button"
-                        className="absolute bottom-5 right-3"
+                  <div className="relative">
+                    <Label className="text-md font-bold " htmlFor="cpassword">
+                      Confirm password
+                    </Label>
+                    <Input
+                      required
+                      className="mb-3 text-surface"
+                      value={user.cpassword}
+                      onChange={(event) =>
+                        setUser({ ...user, cpassword: event.target.value })
+                      }
+                      id="cpassword"
+                      placeholder="verystrongpassword"
+                      type={passwordVisible ? "text" : "password"}
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      disabled={loading}
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPasswordVisible(!passwordVisible);
+                      }}
+                      role="button"
+                      className="absolute bottom-5 right-3"
+                    >
+                      <svg
+                        className="h-6 w-6 stroke-surface"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
                       >
-                        <svg
-                          className="h-6 w-6 stroke-surface"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          {passwordVisible ? (
-                            <>
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                            </>
-                          ) : (
+                        {passwordVisible ? (
+                          <>
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                              d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
                             />
-                          )}
-                        </svg>
-                      </button>
-                    </div>
-                  <Button type="submit" disabled={loading}>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                          </>
+                        ) : (
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                          />
+                        )}
+                      </svg>
+                    </button>
+                  </div>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    onClick={handlePostrequest}
+                  >
                     {loading && (
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                     )}

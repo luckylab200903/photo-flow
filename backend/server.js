@@ -6,8 +6,10 @@ const statusRoute=require("./routes/statusRoute")
 const connectToMongoDB = require("./connectDB/connect");
 const searchRoute=require("./routes/searchRoute")
 const app = express();
+const cors=require("cors")
 require("dotenv").config();
 //require("./connectDB/googleOauth")
+app.use(cors())
 jwtpassport();
 app.use(express.json());
 app.use("/api", userRoutes);
