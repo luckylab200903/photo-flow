@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
-import { Toaster } from "@/components/ui/sonner"
-
-
+import { Toaster } from "@/components/ui/sonner";
+import { useCookies } from 'react-cookie';
 export const metadata: Metadata = {
   title: "FotoFlow",
   description: "...",
@@ -17,8 +16,9 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <html lang="en">
-        <body>{children}
-         <Toaster />
+        <body>
+          {children}
+          <Toaster />
         </body>
       </html>
     </StoreProvider>

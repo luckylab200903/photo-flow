@@ -2,31 +2,61 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn, makeAuthenticatedPOSTRequest } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
-
+import Cookies from 'js-cookie';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
+import { useRouter } from 'next/navigation'
 export default function Signin() {
   const dispatch = useAppDispatch();
-
+  const router = useRouter()
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { loading, isAuth, error } = useAppSelector((state) => state.user);
-
+  const [token, setToken] = useState('');
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
+  useEffect(() => {
+    // Check if the token cookie exists
+    const token = Cookies.get('token');
 
-  async function onSubmit(event) {
-    event.preventDefault();
-    // await dispatch(loginUser(user.email, user.password));
-  }
+    // If token exists, redirect to home page
+    if (token) {
+      router.push('/'); // Replace '/home' with the actual path of your home page
+    }
+  }, [router]);
+  const handlePostrequest = async (e: any) => {
+    console.log("happening");
+    
+    e.preventDefault();
+    const data = {
+      email: user.email,
+      password: user.password,
+    };
+    try {
+      const response = await makeAuthenticatedPOSTRequest("/login", data);
+      const receivedToken = response.token;
+        
+      setToken(receivedToken);
+      Cookies.set('token', receivedToken, { expires: 7 });
+      router.push("/")
+      console.log(response);
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  // async function onSubmit(event) {
+  //   event.preventDefault();
+  //   // await dispatch(loginUser(user.email, user.password));
+  // }
 
   // useEffect(() => {
   //   if (isAuthenticated && user.email === import.meta.env.VITE_ADMIN_EMAIL)
@@ -54,7 +84,7 @@ export default function Signin() {
             href="/signup"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-24 top-4 md:right-24 md:top-8",
+              "absolute right-24 top-4 md:right-24 md:top-8"
             )}
           >
             Sign up
@@ -63,7 +93,7 @@ export default function Signin() {
             href="/"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-4 top-4 md:right-8 md:top-8",
+              "absolute right-4 top-4 md:right-8 md:top-8"
             )}
           >
             <svg
@@ -170,7 +200,11 @@ export default function Signin() {
                       </button>
                     </div>
                   </div>
-                  <Button type="submit" disabled={loading}>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    onClick={handlePostrequest}
+                  >
                     {loading && (
                       <Icons.spinner className="mr-2 fill-none h-4 w-4 animate-spin" />
                     )}

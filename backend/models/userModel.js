@@ -28,36 +28,31 @@ const UserSchema = new mongoose.Schema({
     require: true,
     min: 6,
   },
-  description: {
-    type: String,
-    max: 50,
-    default: "",
-  },
-  profilePicture: {
-    type: String,
-    default: "https://media.tenor.com/WWBL18qey9IAAAAM/hello.gif",
-  },
-  followers: {
-    type: Array,
-    default: [],
-  },
-  followings: {
-    type: Array,
-    default: [],
-  },
-  role: {
-    type: String,
-    enum: ["admin", "user"],
-    required: true,
-    default: "user",
-  },
-  gender: {
-    type: String,
-    enum: ["male", "female"],
-  },
-  jwtToken: {
-    type: String,
-  },
-});
+}
+  // description: {
+  //   type: String,
+  //   max: 50,
+  //   default: "",
+  // },
+  // profilePicture: {
+  //   type: String,
+  //   default: "https://media.tenor.com/WWBL18qey9IAAAAM/hello.gif",
+  // },
+  // followers: {
+  //   type: Array,
+  //   default: [],
+  // },
+  // followings: {
+  //   type: Array,
+  //   default: [],
+  // },
+  // gender: {
+  //   type: String,
+  //   enum: ["male", "female"],
+  // },
+  // jwtToken: {
+  //   type: String,
+  // },
+);
 
 module.exports = mongoose.model("User", UserSchema);

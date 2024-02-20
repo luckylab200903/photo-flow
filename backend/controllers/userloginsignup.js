@@ -17,13 +17,10 @@ const registerUser = expressAsync(async (req, res) => {
 
   if (
     !email ||
-    !gender ||
-    !description ||
     !username ||
     !firstname ||
     !lastname ||
-    !password ||
-    !profilePicture
+    !password 
   ) {
     res.status(400).json({ error: "Please fill in all the details" });
     return;
@@ -42,9 +39,9 @@ const registerUser = expressAsync(async (req, res) => {
     email: email,
     username: username,
     password: hashedPassword,
-    gender: gender,
-    description: description,
-    profilePicture: profilePicture,
+    //gender: gender,
+    //description: description,
+    //profilePicture: profilePicture,
   });
 
   const token = await generateToken(email, newUser);
