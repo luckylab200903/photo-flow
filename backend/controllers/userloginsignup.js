@@ -15,24 +15,21 @@ const registerUser = expressAsync(async (req, res) => {
     password,
   } = req.body;
 
-  if (
-    !email ||
-    !username ||
-    !firstname ||
-    !lastname ||
-    !password 
-  ) {
-    res.status(400).json({ error: "Please fill in all the details" });
-    return;
-  }
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(password, salt);
-  const existingUser = await User.findOne({ email: email });
-  if (existingUser) {
-    res.status(400).json({ error: "User already exists" });
-    return;
+  // Validate required fields
+  if (!email || !username || !firstname || !lastname || !password) {
+    return res.status(400).json({ error: "Please fill in all the details" });
   }
 
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email: email });
+  if (existingUser) {
+    return res.status(400).json({ error: "User already exists" });
+  }
+
+  // Hash the password
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  // Create the new user
   const newUser = await User.create({
     firstname: firstname,
     lastname: lastname,
@@ -44,38 +41,44 @@ const registerUser = expressAsync(async (req, res) => {
     //profilePicture: profilePicture,
   });
 
+  // Generate token for the new user
   const token = await generateToken(email, newUser);
+
+  // Prepare response without password
   const userToReturn = { ...newUser.toJSON(), token };
   delete userToReturn.password;
 
+  // Send response
   res.status(200).json(userToReturn);
 });
 
 const loginUser = expressAsync(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    res.sendStatus(400).json({
-      msg: "enter both the fields",
+    return res.status(400).json({
+      msg: "Enter both the fields",
     });
   }
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    res.sendStatus(401).json({
-      message: "no user with this email",
+    return res.status(401).json({
+      message: "No user with this email",
     });
   }
 
-  const ispasswordvalid = bcrypt.compareSync(password, user.password);
-  if (!ispasswordvalid) {
-    res.sendStatus(403).json({
-      msg: "invalid credentials",
+  const isPasswordValid = bcrypt.compareSync(password, user.password);
+  if (!isPasswordValid) {
+    return res.status(403).json({
+      msg: "Invalid credentials",
     });
   }
+
   const token = await generateToken(email, user);
   const userToReturn = { ...user.toJSON(), token };
   delete userToReturn.password;
-  res.status(200).json(userToReturn);
+  return res.status(200).json(userToReturn);
 });
+
 
 module.exports = { registerUser, loginUser };
