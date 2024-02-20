@@ -172,7 +172,7 @@ export default function Signin() {
                   </div>
                   <Button type="submit" disabled={loading}>
                     {loading && (
-                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                      <Icons.spinner className="mr-2 fill-none h-4 w-4 animate-spin" />
                     )}
                     Sign In with Email
                   </Button>
