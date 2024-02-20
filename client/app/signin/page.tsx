@@ -5,36 +5,33 @@ import Image from "next/image";
 import { cn, makeAuthenticatedPOSTRequest } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from "next/navigation";
 export default function Signin() {
   const dispatch = useAppDispatch();
-  const router = useRouter()
+  const router = useRouter();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { loading, isAuth, error } = useAppSelector((state) => state.user);
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState("");
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
-  useEffect(() => {
-    // Check if the token cookie exists
-    const token = Cookies.get('token');
-
-    // If token exists, redirect to home page
-    if (token) {
-      router.push('/'); // Replace '/home' with the actual path of your home page
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   const token = Cookies.get('token');
+  //   if (!token) {
+  //     redirect('/signin');
+  //   } 
+  // }, []);
   const handlePostrequest = async (e: any) => {
     console.log("happening");
-    
+
     e.preventDefault();
     const data = {
       email: user.email,
@@ -43,10 +40,9 @@ export default function Signin() {
     try {
       const response = await makeAuthenticatedPOSTRequest("/login", data);
       const receivedToken = response.token;
-        
       setToken(receivedToken);
-      Cookies.set('token', receivedToken, { expires: 7 });
-      router.push("/")
+      Cookies.set("token", receivedToken, { expires: 7 });
+      router.push("/");
       console.log(response);
     } catch (error) {
       console.error("An error occurred:", error);

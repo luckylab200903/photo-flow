@@ -4,7 +4,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { useEffect, useState } from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
@@ -12,15 +12,15 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { makeAuthenticatedPOSTRequest } from "../../lib/utils";
 
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
 export default function Signin() {
   const dispatch = useAppDispatch();
-  const router = useRouter()
+  const router = useRouter();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const { loading, isAuth, error } = useAppSelector((state) => state.user);
   //const [cookies,setCookies]=useCookies(["cookie"])
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState("");
   const [user, setUser] = useState({
     username: "",
     firstname: "",
@@ -29,12 +29,16 @@ export default function Signin() {
     password: "",
     cpassword: "",
   });
-  useEffect(() => {
-    const token = Cookies.get('token');
-    if (token) {
-      router.push('/'); 
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   const token = Cookies.get("token");
+  //   if (!token) {
+  //     redirect("/signup");
+  //   } else {
+  //     // Uncomment the line below to delete the token cookie and log the user out
+  //     Cookies.remove("token");
+  //     router.push("/");
+  //   }
+ // }, []);
   const handlePostrequest = async (e: any) => {
     e.preventDefault();
     console.log("happening");
@@ -54,13 +58,12 @@ export default function Signin() {
       const response = await makeAuthenticatedPOSTRequest("/signup", data);
       if (response && response.token) {
         const receivedToken = response.token;
-        
+
         setToken(receivedToken);
         console.log("Response from signup:", response);
         // Send the token to the server for storage
         //setCookies("name", response.token, { path: "/" });
-        Cookies.set('token', receivedToken, { expires: 7 }); // Cookie expires in 7 days
-
+        Cookies.set("token", receivedToken, { expires: 7 }); // Cookie expires in 7 days
         router.push("/");
       } else {
         console.log("api failure");
