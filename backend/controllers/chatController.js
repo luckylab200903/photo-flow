@@ -2,7 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel.js");
 const User = require("../models/userModel.js");
 
-const accessChat = expressAsyncHandler(async (req, res) => {
+const makeChat = expressAsyncHandler(async (req, res) => {
   const { userId } = req.body;
   if (!userId) {
     console.log("userID is not present with the request");
@@ -14,12 +14,13 @@ const accessChat = expressAsyncHandler(async (req, res) => {
   try {
     const isChat = await Chat.findOne({
       isGroupChat: false,
-      users: {
-        $all: [req.user._id, userId],
-      },
+      $and: [
+        { users: { $elemMatch: { $eq: req.user._id } } },
+        { users: { $elemMatch: { $eq: userId } } },
+      ],
     })
       .populate("users", "-password")
-      .populate("latestMessage.sender", "name email pic");
+      .populate("latestMessage.sender", "name email");
 
     if (isChat) {
       res.status(200).send(isChat);
@@ -34,7 +35,7 @@ const accessChat = expressAsyncHandler(async (req, res) => {
 
       const fullChat = await Chat.findOne({ _id: createdChat._id })
         .populate("users", "-password")
-        .populate("latestMessage.sender", "name email pic");
+        .populate("latestMessage.sender", "name email");
 
       res.status(200).send(fullChat);
     }
@@ -43,17 +44,17 @@ const accessChat = expressAsyncHandler(async (req, res) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
 const fetchChat = expressAsyncHandler(async (req, res) => {
   try {
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
-      .populate("groupAdmin", "-password")
       .populate("latestMessage")
       .sort({ updatedAt: -1 })
       .then(async (results) => {
         results = await User.populate(results, {
           path: "latesMessage.sender",
-          select: "name pic email",
+          select: "name email",
         });
         res.status(200).send(results);
       });
@@ -63,4 +64,4 @@ const fetchChat = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { fetchChat, accessChat };
+module.exports = { makeChat, fetchChat };

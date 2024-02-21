@@ -15,21 +15,18 @@ const registerUser = expressAsync(async (req, res) => {
     password,
   } = req.body;
 
-  // Validate required fields
   if (!email || !username || !firstname || !lastname || !password) {
     return res.status(400).json({ error: "Please fill in all the details" });
   }
 
-  // Check if the user already exists
   const existingUser = await User.findOne({ email: email });
   if (existingUser) {
     return res.status(400).json({ error: "User already exists" });
   }
 
-  // Hash the password
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  // Create the new user
+
   const newUser = await User.create({
     firstname: firstname,
     lastname: lastname,
@@ -41,14 +38,12 @@ const registerUser = expressAsync(async (req, res) => {
     //profilePicture: profilePicture,
   });
 
-  // Generate token for the new user
   const token = await generateToken(email, newUser);
 
-  // Prepare response without password
+
   const userToReturn = { ...newUser.toJSON(), token };
   delete userToReturn.password;
 
-  // Send response
   res.status(200).json(userToReturn);
 });
 

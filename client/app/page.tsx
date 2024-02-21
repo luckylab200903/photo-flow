@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = Cookies.get("token");
-    if (!token) {
+    if (!token || token==="undefined") {
       redirect("/signin");
     }
   }, []);
