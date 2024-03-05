@@ -1,22 +1,13 @@
 const mongoose = require("mongoose");
-
+const Post = require("./postModel");
+const User = require("./userModel");
 const photoSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, 
-  caption: String,
-  imageUrl: { type: String, required: true },
+  id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Post",
+  },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   uploadDate: { type: Date, default: Date.now },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
-  comments: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      }, // Reference to the User model
-      text: String,
-      date: { type: Date, default: Date.now },
-    },
-  ],
 });
 
 const Photo = mongoose.model("Photo", photoSchema);

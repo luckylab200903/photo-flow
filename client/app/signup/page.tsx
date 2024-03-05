@@ -29,16 +29,7 @@ export default function Signin() {
     password: "",
     cpassword: "",
   });
-  // useEffect(() => {
-  //   const token = Cookies.get("token");
-  //   if (!token) {
-  //     redirect("/signup");
-  //   } else {
-  //     // Uncomment the line below to delete the token cookie and log the user out
-  //     Cookies.remove("token");
-  //     router.push("/");
-  //   }
- // }, []);
+
   const handlePostrequest = async (e: any) => {
     e.preventDefault();
     console.log("happening");
@@ -63,7 +54,7 @@ export default function Signin() {
         console.log("Response from signup:", response);
         // Send the token to the server for storage
         //setCookies("name", response.token, { path: "/" });
-        Cookies.set("token", receivedToken, { expires: 7 }); // Cookie expires in 7 days
+        Cookies.set("token", receivedToken, { expires: 7 }); 
         router.push("/");
       } else {
         console.log("api failure");
@@ -127,7 +118,7 @@ export default function Signin() {
               />
             </svg>
           </Link>
-          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
+          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px] mt-20">
             <div className="flex flex-col space-y-2 text-center">
               <p className="text-muted-foreground text-sm">SIGN UP</p>
               <h1 className="text-2xl font-semibold tracking-tight">

@@ -1,5 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { type CarouselApi } from "@/components/ui/carousel";
+import { v2 as cloudinary } from "cloudinary";
+import Cookies from "js-cookie";
+import { useRouter } from "next/router";
+
 import {
   Carousel,
   CarouselContent,
@@ -12,13 +16,28 @@ import { Icons } from "../ui/icons";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { makeAuthenticatedPOSTRequest, makeUnauthenticatedPOSTRequest } from "@/lib/utils";
 
+// cloudinary.config({
+//   cloud_name: process.env.cloud_name,
+//   api_key: process.env.api_key,
+//   api_secret: process.env.api_secret,
+// });
+// cloudinary.uploader.upload(
+//   "",
+//   { public_id: "olympic_flag" },
+//   function (error, result) {
+//     console.log(result);
+//   }
+// );
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const AddPost = () => {
+  //const router = useRouter();
+  const [token, setToken] = useState("");
+  //const router = useRouter()
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
-
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles: FileList = e.target.files;
@@ -30,16 +49,68 @@ const AddPost = () => {
           return;
         }
       }
-
       setImageFiles(filesArray);
-
-      // Display image previews
       const previews: string[] = filesArray.map((file) =>
-        URL.createObjectURL(file),
+        URL.createObjectURL(file)
       );
       setImagePreview(previews);
     }
   };
+  const getToken = () => {
+    const accessToken = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+    return accessToken;
+  };
+
+  const handleapirequest = async (pics: File[]) => {
+    if (!pics || pics.length === 0) {
+      console.log("Please select images.");
+      return;
+    }
+  
+    const uploadedImageUrls = [];
+  
+    try {
+      for (let i = 0; i < pics.length; i++) {
+        const formData = new FormData();
+        formData.append("file", pics[i]);
+        formData.append("upload_preset", "fotoflow"); // Replace with your Cloudinary upload preset
+  
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/dtekkvnmz/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to upload image to Cloudinary.");
+        }
+  
+        const imageData = await response.json();
+        uploadedImageUrls.push(imageData.secure_url);
+      }
+      //caption, imageurls 
+      // Call your API with the uploaded image URLs
+      //const token = getToken(); // Assuming this function retrieves the authentication token
+      const data={
+        caption:"hello",
+        imageurls:uploadedImageUrls
+      }
+      const apiResponse = await makeUnauthenticatedPOSTRequest(
+        "/createpost",data, 
+      );
+      alert("post uploaded succesfully")
+      console.log("API response:", apiResponse);
+      router.push("/")
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    }
+  };
+  
 
   return (
     <div className="bg-light rounded-lg mx-5 p-5">
@@ -74,7 +145,7 @@ const AddPost = () => {
           <Icons.videoCameraFilled className="w-10 bg-overlay rounded-full p-2" />
           <Icons.add className="w-10 bg-overlay rounded-full p-2" />
         </div>
-        <Button>Share</Button>
+        <Button onClick={() => handleapirequest(imageFiles)}>Share</Button>
       </div>
     </div>
   );
@@ -108,7 +179,7 @@ const PreviewArea = ({
 
       // Display image previews
       const previews: string[] = filesArray.map((file) =>
-        URL.createObjectURL(file),
+        URL.createObjectURL(file)
       );
       setImagePreview((prev: string[]) => [...prev, ...previews]);
     }
