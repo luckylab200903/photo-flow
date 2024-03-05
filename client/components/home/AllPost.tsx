@@ -116,8 +116,8 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" />
+          <CarouselPrevious className="translate-x-12 md:transform-none" />
+          <CarouselNext className="-translate-x-12 md:transform-none" />
         </Carousel>
       </div>
       <div className="flex justify-between mt-2 md:px-12">
