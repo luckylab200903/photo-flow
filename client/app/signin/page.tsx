@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Cookies from "js-cookie"
+
 import { redirect, useRouter } from "next/navigation";
 export default function Signin() {
   const dispatch = useAppDispatch();
@@ -43,7 +44,7 @@ export default function Signin() {
       setToken(receivedToken);
       Cookies.set("token", receivedToken, { expires: 7 });
       router.push("/");
-      console.log(response);
+      toast(response.message)
     } catch (error) {
       console.error("An error occurred:", error);
     }
