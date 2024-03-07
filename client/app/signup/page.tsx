@@ -34,7 +34,7 @@ export default function Signin() {
     e.preventDefault();
     console.log("happening");
     if (user.password !== user.cpassword) {
-      alert("Password and confirm password do not match");
+      toast("Password and confirm password do not match");
       return;
     }
     const data = {
@@ -56,6 +56,7 @@ export default function Signin() {
         //setCookies("name", response.token, { path: "/" });
         Cookies.set("token", receivedToken, { expires: 7 }); 
         router.push("/");
+        toast(response.message)
       } else {
         console.log("api failure");
       }
