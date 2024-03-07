@@ -28,6 +28,10 @@ const UserSchema = new mongoose.Schema({
     require: true,
     min: 6,
   },
+  profilepicture:{
+    default:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTnrCvOI5sRE1GITYUbD8oGc7mNG-WTYTcFQ&usqp=CAU",
+    type:String
+  }
 }
   // description: {
   //   type: String,
@@ -54,5 +58,7 @@ const UserSchema = new mongoose.Schema({
   //   type: String,
   // },
 );
+
+
 
 module.exports = mongoose.model("User", UserSchema);

@@ -1,12 +1,17 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-   images: {
+  images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'i.imgur.com',
+        hostname: 'encrypted-tbn0.gstatic.com',
         port: '',
-        pathname: '/account123/**',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com', // Corrected hostname
+        port: '',
+        pathname: '/dtekkvnmz/**', // Adjust the pathname as per your requirement
       },
     ],
   },

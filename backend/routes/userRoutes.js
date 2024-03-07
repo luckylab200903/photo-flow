@@ -1,8 +1,11 @@
-const express=require("express");
-const { loginhandle, signuphandle, loginUser, registerUser } = require("../controllers/userloginsignup");
+const express = require("express");
+const { loginUser, registerUser, handleprofilechange, getuserprofile } = require("../controllers/userloginsignup");
+const passport = require("passport");
 
-const router=express.Router();
+const router = express.Router();
 
 router.route("/login").post(loginUser);
 router.route("/signup").post(registerUser);
-module.exports=router;
+router.route('/updateprofilepicture').put(passport.authenticate("jwt",{session:false}), handleprofilechange); 
+router.get('/user/:id', passport.authenticate("jwt", { session: false }), getuserprofile); 
+module.exports = router;

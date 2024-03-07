@@ -84,7 +84,7 @@ const AddPost = () => {
       for (let i = 0; i < pics.length; i++) {
         const formData = new FormData();
         formData.append("file", pics[i]);
-        formData.append("upload_preset", "fotoflow"); // Replace with your Cloudinary upload preset
+        formData.append("upload_preset", "fotoflow"); 
 
         const response = await fetch(
           "https://api.cloudinary.com/v1_1/dtekkvnmz/image/upload",
@@ -95,41 +95,25 @@ const AddPost = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to upload image to Cloudinary.");
-        }
+          const errorText = await response.text(); // Get the error message as plain text
+          throw new Error(`Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`);
+      }
 
         const imageData = await response.json();
         uploadedImageUrls.push(imageData.secure_url);
       }
-<<<<<<< HEAD
       const data={
         caption:"hello",
         imageurls:uploadedImageUrls
       }
       const apiResponse = await makeAuthenticatedPOSTRequest(
         "/createpost",data 
-=======
-      //caption, imageurls
-      // Call your API with the uploaded image URLs
-      //const token = getToken(); // Assuming this function retrieves the authentication token
-      const data = {
-        caption: "hello",
-        imageurls: uploadedImageUrls,
-      };
-      const apiResponse = await makeUnauthenticatedPOSTRequest(
-        "/createpost",
-        data,
->>>>>>> 50e003acfbc5f9a75130467b1917ffcc1dbc2f4d
       );
       toast("post uploaded succesfully");
       setLockBtn(false);
       setImageFiles([]);
       setImagePreview([]);
       console.log("API response:", apiResponse);
-<<<<<<< HEAD
-      //router.push("/")
-=======
->>>>>>> 50e003acfbc5f9a75130467b1917ffcc1dbc2f4d
     } catch (error) {
       console.error("Error uploading images:", error);
       toast(error.message);
