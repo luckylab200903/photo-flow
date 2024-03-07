@@ -93,19 +93,16 @@ const AddPost = () => {
         const imageData = await response.json();
         uploadedImageUrls.push(imageData.secure_url);
       }
-      //caption, imageurls 
-      // Call your API with the uploaded image URLs
-      //const token = getToken(); // Assuming this function retrieves the authentication token
       const data={
         caption:"hello",
         imageurls:uploadedImageUrls
       }
-      const apiResponse = await makeUnauthenticatedPOSTRequest(
-        "/createpost",data, 
+      const apiResponse = await makeAuthenticatedPOSTRequest(
+        "/createpost",data 
       );
       alert("post uploaded succesfully")
       console.log("API response:", apiResponse);
-      router.push("/")
+      //router.push("/")
     } catch (error) {
       console.error("Error uploading images:", error);
     }
