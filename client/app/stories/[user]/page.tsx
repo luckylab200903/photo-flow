@@ -1,11 +1,12 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Icons } from "@/components/ui/icons";
-import { useState } from "react";
-import Link from "next/Link";
+"use client";
+import CarouselView from "@/components/stories/CarouselView";
+import List from "@/components/stories/List";
+import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 
-const Story = () => {
-  const [stories, setStorie] = useState([
+const Page = () => {
+  const [stories, setStories] = useState([
     {
       userImg: "/img/profiles/aether.jpg",
       userName: "aether",
@@ -85,37 +86,28 @@ const Story = () => {
       seen: false,
     },
   ]);
+  const pathname = usePathname();
+  const [currentStory, setCurrentStory] = useState(0);
+  const userName = pathname.split("/")[2];
+  useEffect(() => {
+    const index = stories.findIndex((story) => story.userName === userName);
+    if (index !== -1) {
+      setCurrentStory(index);
+    } else {
+      toast("User's story not found");
+    }
+  }, [pathname]);
   return (
-    <div className="w-full py-4">
-      <ScrollArea className="whitespace-nowrap">
-        <div className="flex">
-          <div className="flex pl-5 flex-col items-center gap-1">
-            <div className="rounded-full border-2 border-surface">
-              <Avatar className="border-2 bg-slate-100 p-4 border-gray w-16 h-16">
-                <Icons.add className="" />
-              </Avatar>
-            </div>
-            <p className="text-xs font-bold text-center">Add Story</p>
-          </div>
-          {stories.map((story, index) => (
-            <Link key={index} href={`/stories/${story.userName}`}>
-              <div className="flex ml-5 flex-col items-center gap-1">
-                <div className="rounded-full border-2 border-surface">
-                  <Avatar className="border-2 border-gray w-16 h-16">
-                    <AvatarImage src={story.userImg} alt={story.userName} />
-                    <AvatarFallback>{story.userName[0]}</AvatarFallback>
-                  </Avatar>
-                </div>
-                <p className="text-xs font-bold text-center">
-                  {story.userName}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
+    <div className="h-screen">
+      <div className="absolute z-10 md:relative">
+        <List stories={stories} currentStory={currentStory} />
+      </div>
+      <CarouselView
+        stories={stories}
+        currentStory={currentStory}
+        setStories={setStories}
+      />
     </div>
   );
 };
-export default Story;
+export default Page;

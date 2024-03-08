@@ -18,7 +18,7 @@ export default function Home() {
 
   useEffect(() => {
     const token = Cookies.get("token");
-    if (!token || token==="undefined") {
+    if (!token || token === "undefined") {
       redirect("/signin");
     }
   }, []);
@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <div className="relative rounded-lg md:flex md:justify-between md:pl-24 bg-gray min-h-screen w-screen">
       <div className="w-full h-screen overflow-scroll md:pr-5">
-        <Story className="" />
+        <Story />
         <div className="md:hidden px-5">
           <SearchBar />
         </div>
