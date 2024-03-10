@@ -54,7 +54,7 @@ const CarouselView = ({ stories, currentStory, setStories }) => {
         className="w-full max-w-md mx-auto"
       >
         <CarouselContent className="md:mx-auto">
-          {stories[currentStory].images.map((img, i) => (
+          {stories[currentStory]&&stories[currentStory].images.map((img, i) => (
             <CarouselItem
               key={i}
               className="md:flex items-center justify-center"

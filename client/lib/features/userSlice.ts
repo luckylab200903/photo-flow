@@ -5,11 +5,19 @@ const initialState: userSliceState = {
   loading: false,
   isAuth: false,
   error: null,
-  data: null,
+  data: {
+    username:"",
+    name:"",
+    email:"",
+    profilepicture:"",
+    followers:[],
+    following:[],
+    posts:[],
+  },
 };
 
 export const userSlice = createSlice({
-  name: "User",
+  name: "user",
   initialState,
   reducers: {
     loadReq: (state) => {

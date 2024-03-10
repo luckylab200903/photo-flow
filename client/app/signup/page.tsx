@@ -74,7 +74,9 @@ export default function Signin() {
   useEffect(() => {
     error && toast(`${error}`);
   }, [error]);
-
+  console.log(
+    useAppSelector(state=>state.counter)
+  )
   return (
     <>
       <div className="container relative grid h-[800px] flex-col items-center justify-center lg:h-screen lg:max-w-none lg:grid-cols-2 lg:px-0">

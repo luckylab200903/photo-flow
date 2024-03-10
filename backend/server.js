@@ -11,6 +11,7 @@ const cloudRoutes = require("./routes/cloudRoutes");
 const app = express();
 const upload = require("./middleware/multer");
 const postRoutes = require("./routes/postRoute");
+const storyRoutes=require("./routes/storyRoutes")
 //const cloudinary = require("./controllers/cloudcontroller");
 const fs = require("fs");
 
@@ -33,6 +34,7 @@ app.use("/api", searchRoute);
 app.use("/api", chatRoutes);
 app.use("/api", messageRoutes);
 app.use("/api", postRoutes);
+app.use("/api",storyRoutes)
 
 const port = process.env.PORT || 5000;
 try {

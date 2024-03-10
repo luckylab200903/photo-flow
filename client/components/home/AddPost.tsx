@@ -100,6 +100,8 @@ const AddPost = () => {
         }
 
         const imageData = await response.json();
+        console.log(imageData);
+        
         uploadedImageUrls.push(imageData.secure_url);
       }
       const data = {

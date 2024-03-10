@@ -15,6 +15,22 @@ const {
   LOGOUT_USER_FAIL,
 } = userSlice.actions;
 
+
+// Load User
+export const loadUser = () => async (dispatch) => {
+  try {
+    dispatch(LOAD_USER_REQUEST());
+
+    const { data } = await axios.get(
+      `${import.meta.env.VITE_API_ENDPOINT}/user/profile`,
+    );
+
+    dispatch(LOAD_USER_SUCCESS(data.user1));
+  } catch (error) {
+    dispatch(LOAD_USER_FAIL(error.response.data));
+  }
+};
+
 // Register User
 export const registerUser = (userData) => async (dispatch) => {
   try {
@@ -64,20 +80,6 @@ export const loginUser = (email, password) => async (dispatch) => {
   }
 };
 
-// Load User
-export const loadUser = () => async (dispatch) => {
-  try {
-    dispatch(LOAD_USER_REQUEST());
-
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_API_ENDPOINT}/user/profile`,
-    );
-
-    dispatch(LOAD_USER_SUCCESS(data.user1));
-  } catch (error) {
-    dispatch(LOAD_USER_FAIL(error.response.data));
-  }
-};
 
 // Logout User
 export const logoutUser = () => async (dispatch) => {

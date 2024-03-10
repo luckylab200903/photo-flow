@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import {
   Carousel,
   CarouselContent,
@@ -19,20 +20,25 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import {
+  makeAuthenticatedGETRequest,
+  makeAuthenticatedPOSTRequest,
+} from "@/lib/utils";
+import { toast } from "sonner";
+import { backendURl } from "@/lib/backend";
+import { jwtDecode } from "jwt-decode";
 
 const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
   //carousel states
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
-
+  const [userId, setUserId] = useState("");
   //image states
   const MAX_FILE_SIZE = 1024 * 1024 * 55; //5MB
   const [lockBtn, setLockBtn] = useState<boolean>(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
-
-  // select images
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles: FileList = e.target.files;
@@ -49,9 +55,107 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
 
       // Display image previews
       const previews: string[] = filesArray.map((file) =>
-        URL.createObjectURL(file),
+        URL.createObjectURL(file)
       );
       setImagePreview((prev: string[]) => [...prev, ...previews]);
+    }
+  };
+
+  const getToken = () => {
+    const accessToken = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+    return accessToken;
+  };
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken);
+
+      const { identifier } = decodedToken;
+      setUserId(identifier);
+      console.log("user id from image selector", identifier);
+      setUserId(identifier);
+    }
+  }, []);
+  useEffect(() => {
+    const makeAuthenticatedGETRequest = async (route: string) => {
+      const token = getToken();
+      const response = await fetch(backendURl + route, {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const formattedData = await response.json();
+      return formattedData;
+    };
+
+    const fetchUserData = async () => {
+      try {
+        if (userId) {
+          const userData = await makeAuthenticatedGETRequest(`/user/${userId}`);
+          console.log(userData);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
+  const uploadedstoryUrls: string[] = [];
+  const handleClick = async () => {
+    try {
+      console.log("ENTERING POST");
+      console.log(userId);
+      for (let i = 0; i < imageFiles.length; i++) {
+        const formData = new FormData();
+        formData.append("file", imageFiles[i]);
+        formData.append("upload_preset", "fotoflow");
+
+        const response = await fetch(
+          "https://api.cloudinary.com/v1_1/dtekkvnmz/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        console.log(response);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`
+          );
+        }
+
+        console.log("yha nhi hai error");
+
+        const imageData = await response.json();
+        uploadedstoryUrls.push(imageData.secure_url);
+      }
+
+      console.log(ImageData);
+      console.log("yha  hai error");
+      const data = {
+        userId,
+        imagesUrl: uploadedstoryUrls,
+        viewedBy: [],
+      };
+      const apiResponse = await makeAuthenticatedPOSTRequest(
+        "/uploadstory",
+        data
+      );
+      toast("story uploaded succesfully");
+      console.log("API response:", apiResponse);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast(error.message);
     }
   };
 
@@ -68,6 +172,7 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
   return (
     <div>
       <Drawer>
@@ -89,10 +194,10 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
                     <Button
                       onClick={() => {
                         setImagePreview((prev) =>
-                          prev.filter((str, id) => i != id),
+                          prev.filter((str, id) => i != id)
                         );
                         setImageFiles((prev) =>
-                          prev.filter((files, id) => i != id),
+                          prev.filter((files, id) => i != id)
                         );
                       }}
                       variant="ghost"
@@ -137,8 +242,9 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
                 />
                 <label
                   htmlFor="hidden-input"
-                  className={`flex h-80 w-48 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-400 ${lockBtn && "opacity-50"
-                    }`}
+                  className={`flex h-80 w-48 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-400 ${
+                    lockBtn && "opacity-50"
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +266,7 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
           </Carousel>
 
           <DrawerFooter className="flex flex-row justify-end">
-            <Button>Post</Button>
+            <Button onClick={handleClick}>Post</Button>
             <DrawerClose>
               <Button
                 variant="outline"
