@@ -3,6 +3,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Icons } from "@/components/ui/icons";
 import { useState } from "react";
 import Link from "next/Link";
+import StoryImageSelector from "./StoryImageSelector";
 
 const Story = () => {
   const [stories, setStorie] = useState([
@@ -89,18 +90,18 @@ const Story = () => {
     <div className="w-full py-4">
       <ScrollArea className="whitespace-nowrap">
         <div className="flex">
-          <div className="flex pl-5 flex-col items-center gap-1">
-            <div className="rounded-full border-2 border-surface">
+          <StoryImageSelector>
+            <div className="h-auto p-0 rounded-full ml-5 border-2 border-surface">
               <Avatar className="border-2 bg-slate-100 p-4 border-gray w-16 h-16">
-                <Icons.add className="" />
+                <Icons.add />
               </Avatar>
             </div>
-            <p className="text-xs font-bold text-center">Add Story</p>
-          </div>
+            <p className="text-xs font-bold text-center ml-5">Add Story</p>
+          </StoryImageSelector>
           {stories.map((story, index) => (
             <Link key={index} href={`/stories/${story.userName}`}>
               <div className="flex ml-5 flex-col items-center gap-1">
-                <div className="rounded-full border-2 border-surface">
+                <div className="rounded-full bg-white border-2 border-surface">
                   <Avatar className="border-2 border-gray w-16 h-16">
                     <AvatarImage src={story.userImg} alt={story.userName} />
                     <AvatarFallback>{story.userName[0]}</AvatarFallback>

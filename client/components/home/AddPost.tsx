@@ -37,9 +37,7 @@ import {
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const AddPost = () => {
-  //const router = useRouter();
   const [token, setToken] = useState("");
-  //const router = useRouter()
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [lockBtn, setLockBtn] = useState<boolean>(false);
@@ -84,7 +82,7 @@ const AddPost = () => {
       for (let i = 0; i < pics.length; i++) {
         const formData = new FormData();
         formData.append("file", pics[i]);
-        formData.append("upload_preset", "fotoflow"); 
+        formData.append("upload_preset", "fotoflow");
 
         const response = await fetch(
           "https://api.cloudinary.com/v1_1/dtekkvnmz/image/upload",
@@ -96,18 +94,21 @@ const AddPost = () => {
 
         if (!response.ok) {
           const errorText = await response.text(); // Get the error message as plain text
-          throw new Error(`Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`);
-      }
+          throw new Error(
+            `Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`,
+          );
+        }
 
         const imageData = await response.json();
         uploadedImageUrls.push(imageData.secure_url);
       }
-      const data={
-        caption:"hello",
-        imageurls:uploadedImageUrls
-      }
+      const data = {
+        caption: "hello",
+        imageurls: uploadedImageUrls,
+      };
       const apiResponse = await makeAuthenticatedPOSTRequest(
-        "/createpost",data 
+        "/createpost",
+        data,
       );
       toast("post uploaded succesfully");
       setLockBtn(false);
@@ -142,7 +143,7 @@ const AddPost = () => {
       <div className="flex mt-2 justify-between">
         <div className="flex gap-3">
           <input
-            id="hidden-input"
+            id="add-post-input"
             type="file"
             className="hidden"
             onChange={handleImageSelect}
@@ -150,7 +151,7 @@ const AddPost = () => {
             disabled={lockBtn || imageFiles.length > 0}
             multiple
           />
-          <label htmlFor="hidden-input" className="">
+          <label htmlFor="add-post-input" className="">
             <Icons.cameraFilled className="w-10 bg-overlay rounded-full p-2" />
           </label>
           <Icons.videoCameraFilled className="w-10 bg-overlay rounded-full p-2" />
@@ -274,9 +275,8 @@ const PreviewArea = ({
             />
             <label
               htmlFor="hidden-input"
-              className={`flex h-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-400 ${
-                lockBtn && "opacity-50"
-              }`}
+              className={`flex h-full cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-400 ${lockBtn && "opacity-50"
+                }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

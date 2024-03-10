@@ -1,7 +1,7 @@
 import { Input } from "./ui/input";
 import { Button } from './ui/button';
 import { Icons } from './ui/icons';
-
+
 const SearchBar = (
 ) => {
   return (
@@ -17,3 +17,4 @@ const SearchBar = (
   );
 };
 export default SearchBar;
+
