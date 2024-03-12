@@ -44,10 +44,19 @@ export const makeAuthenticatedGETRequest = async (route: string) => {
       authorization: `Bearer ${token}`,
     },
   });
-  const formattedData = await response.json();
-  //console.log(formattedData);
-  return formattedData;
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${backendURl + route}: ${response.status} ${response.statusText}`);
+  }
+
+  try {
+    const formattedData = await response.json();
+    return formattedData;
+  } catch (error) {
+    throw new Error(`Failed to parse JSON response: ${error.message}`);
+  }
 };
+
 
 const getToken = () => {
   const accessToken = document.cookie.replace(

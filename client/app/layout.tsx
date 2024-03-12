@@ -11,6 +11,9 @@ import { usePathname } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { counterSlice } from "@/lib/features/countSlice";
+import { Provider } from "react-redux";
+import { Providers } from "../lib/providers";
+import { loadUser } from "@/lib/actions/userActions";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -85,8 +88,8 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <html lang="en">
-        <DataFetch />
         <body>
+          <FetchData userId={userId} />
           {children}
           <Toaster />
         </body>
@@ -94,10 +97,18 @@ export default function RootLayout({
     </StoreProvider>
   );
 }
-const DataFetch = () => {
+const FetchData = ({ userId }) => {
   const dispatch = useAppDispatch();
+
   useEffect(() => {
-    dispatch(counterSlice.actions.increment());
-    console.log("holdfsj");
-  }, [dispatch]);
+    dispatch(loadUser({ userId: userId }))
+  }, [userId]);
+
+  const data = useAppSelector((state) => state.user.data);
+
+  return (
+    <div>
+      <p>{JSON.stringify(data)}</p>
+    </div>
+  );
 };

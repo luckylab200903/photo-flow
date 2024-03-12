@@ -14,7 +14,6 @@ import { useEffect } from "react";
 import Cookies from "js-cookie";
 export default function Home() {
   const dispatch = useAppDispatch();
-  const { value, status } = useAppSelector((state) => state.counter);
 
   useEffect(() => {
     const token = Cookies.get("token");

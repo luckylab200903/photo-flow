@@ -1,35 +1,57 @@
 import axios from "axios";
 
 import { userSlice } from "@/lib/features/userSlice";
+
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { makeAuthenticatedGETRequest } from "../utils";
 const {
-  REGISTER_USER_FAIL,
-  REGISTER_USER_REQUEST,
-  REGISTER_USER_SUCCESS,
-  LOGIN_USER_REQUEST,
-  LOAD_USER_SUCCESS,
-  LOAD_USER_FAIL,
-  LOGOUT_USER_SUCCESS,
-  LOGIN_USER_SUCCESS,
-  LOGIN_USER_FAIL,
-  LOAD_USER_REQUEST,
-  LOGOUT_USER_FAIL,
+  loadReq,
+  loadSuccess,
+  loadFail
 } = userSlice.actions;
 
-
-// Load User
-export const loadUser = () => async (dispatch) => {
+export const loadUser = ({ userId }: { userId: string }) => async (dispatch: any) => {
   try {
-    dispatch(LOAD_USER_REQUEST());
-
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_API_ENDPOINT}/user/profile`,
-    );
-
-    dispatch(LOAD_USER_SUCCESS(data.user1));
+    dispatch(loadReq());
+    console.log("Loading user...");
+    console.log("userid from useeractions",userId);
+    const response = await makeAuthenticatedGETRequest(`/user/${userId}`);
+    console.log("Response received:", response);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    const json = await response.json();
+    console.log("JSON data from user action:", json);
+    dispatch(loadSuccess(json));
   } catch (error) {
-    dispatch(LOAD_USER_FAIL(error.response.data));
+    console.error("Error loading user:", error);
+    dispatch(loadFail(error.response));
   }
 };
+
+
+// export const loadUser = ({userId: string}) => async (dispatch) => {
+//   try {
+    
+    
+
+//     dispatch(loadReq());
+//     console.log("fromn func",userId)
+//     console.log("hello");
+    
+//     const response = await makeAuthenticatedGETRequest(`/user/${userId}`);
+//     console.log("hello 2");
+    
+//     const json = await response.json();
+//     console.log("json from useractions", );
+//     dispatch(loadSuccess(response.json()));
+//   } catch (error:any) {
+//     dispatch(loadFail(error.response));
+//   }
+// };
 
 // Register User
 export const registerUser = (userData) => async (dispatch) => {
