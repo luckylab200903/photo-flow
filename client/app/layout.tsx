@@ -89,7 +89,7 @@ export default function RootLayout({
     <StoreProvider>
       <html lang="en">
         <body>
-          <FetchData userId={userId} />
+          {/* <FetchData userId={userId} /> */}
           {children}
           <Toaster />
         </body>
