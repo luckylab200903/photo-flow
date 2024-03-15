@@ -8,15 +8,13 @@ const searchRoute = require("./routes/searchRoute");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoute");
 const cloudRoutes = require("./routes/cloudRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 const upload = require("./middleware/multer");
 const postRoutes = require("./routes/postRoute");
-const storyRoutes=require("./routes/storyRoutes")
-//const cloudinary = require("./controllers/cloudcontroller");
+const storyRoutes = require("./routes/storyRoutes");
 const fs = require("fs");
-
 const multer = require("multer");
-//const upload = multer({ dest: 'uploads/' })
 const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
@@ -34,7 +32,8 @@ app.use("/api", searchRoute);
 app.use("/api", chatRoutes);
 app.use("/api", messageRoutes);
 app.use("/api", postRoutes);
-app.use("/api",storyRoutes)
+app.use("/api", storyRoutes);
+app.use("/api", notificationRoutes);
 
 const port = process.env.PORT || 5000;
 try {
