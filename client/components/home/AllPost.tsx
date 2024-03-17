@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, makeAuthenticatedGETRequest } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Carousel,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image";
 import { Icons } from "../ui/icons";
+import { useEffect, useState } from "react";
 
 const posts = [
   {
@@ -78,13 +79,35 @@ const posts = [
   },
 ];
 
-const AllPost = ({ className }: { className: string }) => {
+
+ const AllPost = ({ className }: { className: string }) => {
+//   const fetchData = async () => {
+//     try {
+//       const response = await makeAuthenticatedGETRequest("/all/getallposts");
+  
+//       if (!response) {
+//         console.log("No response received");
+//         return;
+//       }
+  
+//       console.log("Posts data:", response);
+  
+//       setPosts(response);
+//     } catch (error) {
+//       console.error("Error in getting the posts:", error.message);
+//     }
+//   };
+//   const [posts, setPosts] = useState([]);
+
+//   useEffect(() => {
+//     fetchData();
+//   }, []);
   return (
-      <div className={cn(className, "py-4 flex flex-col gap-5")}>
-        {posts.map((post, i) => (
-          <Post key={i} post={post} />
-        ))}
-      </div>
+    <div className={cn(className, "py-4 flex flex-col gap-5")}>
+      {posts.map((post, i) => (
+        <Post key={i} post={post} />
+      ))}
+    </div>
   );
 };
 
