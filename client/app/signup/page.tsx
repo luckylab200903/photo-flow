@@ -14,6 +14,7 @@ import { makeAuthenticatedPOSTRequest } from "../../lib/utils";
 
 import { redirect, useRouter } from "next/navigation";
 import { useCookies } from "react-cookie";
+import { loadUser } from "@/lib/actions/userActions";
 export default function Signin() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -54,9 +55,10 @@ export default function Signin() {
         console.log("Response from signup:", response);
         // Send the token to the server for storage
         //setCookies("name", response.token, { path: "/" });
-        Cookies.set("token", receivedToken, { expires: 7 }); 
+        Cookies.set("token", receivedToken, { expires: 7 });
         router.push("/");
-        toast(response.message)
+        toast(response.message);
+        dispatch(loadUser());
       } else {
         console.log("api failure");
       }
@@ -94,7 +96,7 @@ export default function Signin() {
             href="/signin"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-24 top-4 md:right-24 md:top-8"
+              "absolute right-24 top-4 md:right-24 md:top-8",
             )}
           >
             Sign in
@@ -103,7 +105,7 @@ export default function Signin() {
             href="/"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-4 top-4 md:right-8 md:top-8"
+              "absolute right-4 top-4 md:right-8 md:top-8",
             )}
           >
             <svg

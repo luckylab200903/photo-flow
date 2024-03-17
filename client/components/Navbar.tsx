@@ -21,15 +21,10 @@ const Navbar = () => {
         </div>
       ) : (
         <Link className={linkStyle} href="/">
-          <Icons.home
-            className={cn(
-              tabStyle,
-              "md:fill-none",
-            )}
-          />
+          <Icons.home className={cn(tabStyle, "md:fill-none")} />
         </Link>
       )}
-      {pathname === "/notify" ? (
+      {pathname === "/notification" ? (
         <div className={activeTabStyle}>
           <Icons.notifyFilled
             className={cn(
@@ -40,7 +35,7 @@ const Navbar = () => {
           <p className={activeTabText}>Notify</p>
         </div>
       ) : (
-        <Link className={linkStyle} href="/notify">
+        <Link className={linkStyle} href="/notification">
           <Icons.notify className={cn(tabStyle)} />
         </Link>
       )}

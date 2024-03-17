@@ -1,57 +1,67 @@
 import axios from "axios";
 
-import { userSlice } from "@/lib/features/userSlice";
-
-import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import { makeAuthenticatedGETRequest } from "../utils";
-const {
-  loadReq,
-  loadSuccess,
-  loadFail
-} = userSlice.actions;
+import { jwtDecode } from "jwt-decode";
+import { userSlice } from "@/lib/features/userSlice";
+const { loadReq, loadSuccess, loadFail } = userSlice.actions;
 
-export const loadUser = ({ userId }: { userId: string }) => async (dispatch: any) => {
+// Load User
+export const loadUser = () => async (dispatch) => {
   try {
     dispatch(loadReq());
-    console.log("Loading user...");
-    console.log("userid from useeractions",userId);
-    const response = await makeAuthenticatedGETRequest(`/user/${userId}`);
-    console.log("Response received:", response);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+    let userDetails = {};
+
+    //  get userID
+    let userId = "";
+    const token = Cookies.get("token");
+    if (token) {
+      const decodedToken = jwtDecode(token);
+
+      const { identifier } = decodedToken;
+      userId = identifier;
     }
-    
-    const json = await response.json();
-    console.log("JSON data from user action:", json);
-    dispatch(loadSuccess(json));
+
+    // get access token
+    const getToken = () => {
+      const accessToken = document.cookie.replace(
+        /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+        "$1",
+      );
+      return accessToken;
+    };
+
+    // make request
+    const backendURl = "http://localhost:5001/api";
+    const makeAuthenticatedGETRequest = async (route: string) => {
+      const token = getToken();
+      const response = await fetch(backendURl + route, {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const formattedData = await response.json();
+      return formattedData;
+    };
+
+    const fetchUserData = async () => {
+      try {
+        const userData = await makeAuthenticatedGETRequest(`/user/${userId}`);
+        userDetails = userData;
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    await fetchUserData();
+    // const { data } = await axios.get();
+
+    dispatch(loadSuccess(userDetails));
   } catch (error) {
-    console.error("Error loading user:", error);
-    dispatch(loadFail(error.response));
+    dispatch(loadFail(error));
   }
 };
-
-
-// export const loadUser = ({userId: string}) => async (dispatch) => {
-//   try {
-    
-    
-
-//     dispatch(loadReq());
-//     console.log("fromn func",userId)
-//     console.log("hello");
-    
-//     const response = await makeAuthenticatedGETRequest(`/user/${userId}`);
-//     console.log("hello 2");
-    
-//     const json = await response.json();
-//     console.log("json from useractions", );
-//     dispatch(loadSuccess(response.json()));
-//   } catch (error:any) {
-//     dispatch(loadFail(error.response));
-//   }
-// };
 
 // Register User
 export const registerUser = (userData) => async (dispatch) => {
@@ -101,7 +111,6 @@ export const loginUser = (email, password) => async (dispatch) => {
     dispatch(LOGIN_USER_FAIL(error.response.data));
   }
 };
-
 
 // Logout User
 export const logoutUser = () => async (dispatch) => {

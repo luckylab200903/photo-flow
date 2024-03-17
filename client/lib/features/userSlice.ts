@@ -6,13 +6,13 @@ const initialState: userSliceState = {
   isAuth: false,
   error: null,
   data: {
-    username:"",
-    name:"",
-    email:"",
-    profilepicture:"",
-    followers:[],
-    following:[],
-    posts:[],
+    _id: "",
+    email: "",
+    firstname: "",
+    lastname: "",
+    password: "",
+    profilepicture: "",
+    username: "",
   },
 };
 
@@ -21,15 +21,20 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     loadReq: (state) => {
-      loading: true;
+      state.loading = true;
     },
     loadSuccess: (state, action: PayloadAction<object>) => {
-      loading: false;
-      data: action.payload;
+      state.loading = false;
+      state.isAuth = true;
+      state.data = action.payload;
     },
     loadFail: (state, action: PayloadAction<string>) => {
-      loading: false;
-      error: action.payload;
+      state.loading = false;
+      state.isAuth = false;
+      state.error = action.payload;
+    },
+    updateUserProfile: (state, action: PayloadAction<string>) => {
+      state.data.profilepicture = action.payload;
     },
   },
 });
