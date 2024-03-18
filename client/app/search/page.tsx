@@ -9,7 +9,10 @@ const SettingPage = () => {
     <div className="flex-col">
       <div className="md:ml-20 pt-5 px-5">
         <div className="flex justify-between">
-          <div className="md:w-1/2 lg:w-1/4 md:mt-5 md:ml-10 p-4 rounded-lg w-full md:p-0 md:m-0">
+          <div
+            className="md:w-1/2 lg:w-1/4 md:mt-5 md:ml-10 p-4 rounded-lg w-full md:p-0 md:m-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             <SearchBar />
           </div>
           <div className="hidden md:block">

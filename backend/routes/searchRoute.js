@@ -1,7 +1,7 @@
 const express = require("express");
-const { searchUser } = require("../controllers/search");
 const router = express.Router();
+const { searchUser } = require("../controllers/search");
 
-router.route("/search").get(searchUser)
+router.get("/search/:nameRegex", searchUser);
 
-module.exports=router
+module.exports = router;

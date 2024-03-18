@@ -46,16 +46,19 @@ export const makeAuthenticatedGETRequest = async (route: string) => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch ${backendURl + route}: ${response.status} ${response.statusText}`);
+    const errorMessage = `Failed to fetch ${backendURl + route}: ${response.status} ${response.statusText}`;
+    throw new Error(errorMessage);
   }
 
   try {
     const formattedData = await response.json();
     return formattedData;
   } catch (error) {
-    throw new Error(`Failed to parse JSON response: ${error.message}`);
+    const parseError = `Failed to parse JSON response: ${error.message}`;
+    throw new Error(parseError);
   }
 };
+
 
 
 const getToken = () => {

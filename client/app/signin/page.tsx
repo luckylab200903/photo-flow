@@ -11,9 +11,10 @@ import { Icons } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import Cookies from "js-cookie"
+import Cookies from "js-cookie";
 
 import { redirect, useRouter } from "next/navigation";
+import { loadUser } from "@/lib/actions/userActions";
 export default function Signin() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -28,7 +29,7 @@ export default function Signin() {
   //   const token = Cookies.get('token');
   //   if (!token) {
   //     redirect('/signin');
-  //   } 
+  //   }
   // }, []);
   const handlePostrequest = async (e: any) => {
     console.log("happening");
@@ -44,7 +45,8 @@ export default function Signin() {
       setToken(receivedToken);
       Cookies.set("token", receivedToken, { expires: 7 });
       router.push("/");
-      toast(response.message)
+      toast(response.message);
+      disptach(loadUser());
     } catch (error) {
       console.error("An error occurred:", error);
     }
@@ -81,7 +83,7 @@ export default function Signin() {
             href="/signup"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-24 top-4 md:right-24 md:top-8"
+              "absolute right-24 top-4 md:right-24 md:top-8",
             )}
           >
             Sign up
@@ -90,7 +92,7 @@ export default function Signin() {
             href="/"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "absolute right-4 top-4 md:right-8 md:top-8"
+              "absolute right-4 top-4 md:right-8 md:top-8",
             )}
           >
             <svg

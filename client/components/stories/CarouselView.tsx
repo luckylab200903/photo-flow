@@ -36,7 +36,6 @@ const CarouselView = ({ stories, currentStory, setStories }) => {
         }
         return story;
       });
-
       setStories(updatedStories);
     }
   }, [current]);
@@ -54,20 +53,21 @@ const CarouselView = ({ stories, currentStory, setStories }) => {
         className="w-full max-w-md mx-auto"
       >
         <CarouselContent className="md:mx-auto">
-          {stories[currentStory]&&stories[currentStory].images.map((img, i) => (
-            <CarouselItem
-              key={i}
-              className="md:flex items-center justify-center"
-            >
-              <Image
-                src={img}
-                alt="post"
-                width={960}
-                height={540}
-                className="h-screen md:h-[85vh] object-cover"
-              />
-            </CarouselItem>
-          ))}
+          {stories[currentStory] &&
+            stories[currentStory].images.map((img, i) => (
+              <CarouselItem
+                key={i}
+                className="md:flex items-center justify-center"
+              >
+                <Image
+                  src={img}
+                  alt="post"
+                  width={960}
+                  height={540}
+                  className="h-screen md:h-[85vh] object-cover"
+                />
+              </CarouselItem>
+            ))}
         </CarouselContent>
         <CarouselPrevious className="hidden md:flex" />
         <CarouselNext className="hidden md:flex" />

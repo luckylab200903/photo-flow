@@ -1,4 +1,5 @@
 const Post = require("../models/postModel");
+const asynchandler = require("express-async-handler");
 
 const handlepostrequest = async (req, res) => {
   try {
@@ -9,7 +10,11 @@ const handlepostrequest = async (req, res) => {
         .status(400)
         .json({ message: "Caption or image URLs are missing." });
     }
+
+    const userId = req.user._id;
+
     const newPost = new Post({
+      user: userId,
       images: imageurls.map((url) => ({ url })),
       caption,
     });
@@ -24,4 +29,4 @@ const handlepostrequest = async (req, res) => {
   }
 };
 
-module.exports = handlepostrequest;
+module.exports = { handlepostrequest };

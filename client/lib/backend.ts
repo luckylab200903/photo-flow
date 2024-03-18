@@ -1,1 +1,1 @@
-export const backendURl = "http://localhost:5001/api"
+export const backendURl = "http://127.0.0.1:5001/api"
