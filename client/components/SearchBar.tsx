@@ -57,12 +57,17 @@ const SearchBar = () => {
         onKeyDown={SearchSongEnter}
       />
 
-      {isFocused && search && (
+      {search && (
         <div className="absolute top-full left-0 mt-1 bg-slate-900 rounded-lg p-4 w-full z-20 shadow-lg max-h-screen overflow-y-auto">
           {error ? (
             <div className="text-white">{error}</div>
           ) : users && users.length > 0 ? (
-            <div className="space-y-4" onClick={(e)=>{e.stopPropagation()}}>
+            <div
+              className="space-y-4"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
               {users.map((user, index) => (
                 <div
                   key={index}
