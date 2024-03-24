@@ -1,4 +1,8 @@
-import { makeAuthenticatedGETRequest } from "@/lib/utils";
+import React, { useEffect, useState } from "react";
+import {
+  makeAuthenticatedGETRequest,
+  makeAuthenticatedPOSTRequest,
+} from "@/lib/utils";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -9,84 +13,43 @@ import {
 } from "../ui/card";
 import { Icons } from "../ui/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useEffect, useState } from "react";
-
-
-const data = [
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-  {
-    userImg: "https://github.com/shadcn.png",
-    userName: "Jhon Doe",
-    title: "Doctor",
-  },
-];
 
 const Connections = () => {
-  const [connectionsdata,setconnectionsdata]=useState([])
-  const fetchconnectionsDetails = async () => {
+  const [connectionsData, setConnectionsData] = useState([]);
+
+  const fetchConnectionsDetails = async () => {
     try {
-      const data = await makeAuthenticatedGETRequest(
-        "/getusersuggestions"
-      );
-      setconnectionsdata(data)
-      console.log(connectionsdata);
+      const data = await makeAuthenticatedGETRequest("/getusersuggestions");
+      setConnectionsData(data);
+      console.log(connectionsData);
     } catch (error) {
-      console.log("internal server error", error.message);
+      console.log("Internal server error", error.message);
     }
   };
-  
-  useEffect(()=>{
-    fetchconnectionsDetails()
-  },[])
+
+  const handleAddFriend = async (friendId) => {
+    console.log(friendId);
+    try {
+      const response = await makeAuthenticatedPOSTRequest("/addfriends", {
+        friendId,
+      });
+      console.log(response);
+
+      if (response.status === 200) {
+        console.log("Friend added successfully");
+        fetchConnectionsDetails();
+      } else {
+        console.error("Failed to add friend:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error adding friend:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchConnectionsDetails();
+  }, []);
+
   return (
     <div className="max-h-screen">
       <div className="flex justify-between items-center">
@@ -96,26 +59,33 @@ const Connections = () => {
           <Icons.chevronDoubleRight className="w-5 ml-3 fill-none" />
         </Button>
       </div>
-      {connectionsdata && connectionsdata.map((item, index) => (
-        <UserCard {...item} key={index} />
+      {connectionsData.map((item, index) => (
+        <UserCard
+          key={index}
+          profilepicture={item.profilepicture}
+          username={item.username}
+          firstname={item.firstname}
+          onClick={() => handleAddFriend(item._id)}
+        />
       ))}
     </div>
   );
 };
-const UserCard = (props: (typeof data)[0]) => {
+
+const UserCard = ({ profilepicture, username, firstname, onClick }) => {
   return (
     <Card className="flex items-center px-5 mt-5 border-none bg-gray">
       <Avatar className="border-2 border-gray w-16 h-16">
-        <AvatarImage src={props.profilepicture} alt={props.userName} />
-        <AvatarFallback>{props.username}</AvatarFallback>
+        <AvatarImage src={profilepicture} alt={username} />
+        <AvatarFallback>{username}</AvatarFallback>
       </Avatar>
       <div>
         <CardHeader className="pb-2">
-          <CardTitle>{props.username}</CardTitle>
-          <CardDescription>{props.firstname}</CardDescription>
+          <CardTitle>{username}</CardTitle>
+          <CardDescription>{firstname}</CardDescription>
         </CardHeader>
         <CardFooter>
-          <Button className="h-7" variant="outline">
+          <Button className="h-7" variant="outline" onClick={onClick}>
             <Icons.add className="w-5" />
             Follow
           </Button>
@@ -124,4 +94,5 @@ const UserCard = (props: (typeof data)[0]) => {
     </Card>
   );
 };
+
 export default Connections;
