@@ -24,6 +24,21 @@ const Navbar = () => {
           <Icons.home className={cn(tabStyle, "md:fill-none")} />
         </Link>
       )}
+      {pathname === "/search" ? (
+        <div className={activeTabStyle}>
+          <Icons.searchFilled
+            className={cn(
+              tabStyle,
+              "fill-surface md:fill-none  md:stroke-overlay",
+            )}
+          />
+          <p className={activeTabText}>Search</p>
+        </div>
+      ) : (
+        <Link className={linkStyle} href="/search">
+          <Icons.search className={cn(tabStyle)} />
+        </Link>
+      )}
       {pathname === "/notification" ? (
         <div className={activeTabStyle}>
           <Icons.notifyFilled
@@ -37,21 +52,6 @@ const Navbar = () => {
       ) : (
         <Link className={linkStyle} href="/notification">
           <Icons.notify className={cn(tabStyle)} />
-        </Link>
-      )}
-      {pathname === "/setting" ? (
-        <div className={activeTabStyle}>
-          <Icons.settingFilled
-            className={cn(
-              tabStyle,
-              "fill-surface md:fill-none md:stroke-overlay",
-            )}
-          />
-          <p className={activeTabText}>Setting</p>
-        </div>
-      ) : (
-        <Link className={linkStyle} href="/setting">
-          <Icons.setting className={cn(tabStyle)} />
         </Link>
       )}
       {pathname === "/chat" ? (

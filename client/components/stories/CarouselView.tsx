@@ -29,7 +29,10 @@ const CarouselView = ({ stories, currentStory, setStories }) => {
   }, [api]);
 
   useEffect(() => {
-    if (stories[currentStory].images.length - 1 === current) {
+    if (
+      stories[currentStory] &&
+      stories[currentStory].images.length - 1 === current
+    ) {
       const updatedStories = stories.map((story) => {
         if (story.userName === stories[currentStory].userName) {
           return { ...story, seen: true };
@@ -73,7 +76,7 @@ const CarouselView = ({ stories, currentStory, setStories }) => {
         <CarouselNext className="hidden md:flex" />
       </Carousel>
       <Image
-        src={stories[currentStory].images[current]}
+        src={stories[currentStory] && stories[currentStory].images[current]}
         alt="post"
         width={960}
         height={540}

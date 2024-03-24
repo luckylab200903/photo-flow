@@ -101,7 +101,7 @@ const AddPost = () => {
 
         const imageData = await response.json();
         console.log(imageData);
-        
+
         uploadedImageUrls.push(imageData.secure_url);
       }
       const data = {
@@ -131,7 +131,10 @@ const AddPost = () => {
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <Textarea className="ml-5 h-5" placeholder="Whats on your mind..." />
+        <Textarea
+          className="ml-5 h-5 min-h-[80px]"
+          placeholder="Whats on your mind..."
+        />
       </div>
       {imagePreview.length > 0 && (
         <PreviewArea

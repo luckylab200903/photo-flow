@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { makeAuthenticatedGETRequest } from "@/lib/utils";
+import Link from "next/link";
 
 const SearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
@@ -69,11 +70,11 @@ const SearchBar = () => {
               }}
             >
               {users.map((user, index) => (
-                <div
+                <Link
+                  href={`/others/${user._id}`}
                   key={index}
-                  className={`flex items-center text-white cursor-pointer ${
-                    focusedUser === user ? "bg-gray-500" : ""
-                  }`}
+                  className={`flex items-center text-white cursor-pointer ${focusedUser === user ? "bg-gray-500" : ""
+                    }`}
                   onClick={() => handleUserClick(user)} // Add onClick event handler
                   onMouseEnter={() => handleUserFocus(user)}
                   onMouseLeave={handleUserBlur}
@@ -94,7 +95,7 @@ const SearchBar = () => {
                     <div className="font-sm">{user.username}</div>
                     <div className="text-sm mt-1">{user.firstname}</div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
