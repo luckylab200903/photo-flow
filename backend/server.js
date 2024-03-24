@@ -10,10 +10,11 @@ const messageRoutes = require("./routes/messageRoute");
 const cloudRoutes = require("./routes/cloudRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
-const getallpost=require("./routes/getpostRoute")
+const getallpost = require("./routes/getpostRoute");
 const upload = require("./middleware/multer");
 const postRoutes = require("./routes/postRoute");
 const storyRoutes = require("./routes/storyRoutes");
+const usergetroutes = require("./routes/usergetRoutes");
 const fs = require("fs");
 const multer = require("multer");
 const bodyParser = require("body-parser");
@@ -35,7 +36,8 @@ app.use("/api", messageRoutes);
 app.use("/api", postRoutes);
 app.use("/api", storyRoutes);
 app.use("/api", notificationRoutes);
-app.use("/api/all",getallpost);
+app.use("/api/all", getallpost);
+app.use("/api", usergetroutes);
 
 const port = process.env.PORT || 5000;
 try {

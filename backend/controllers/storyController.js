@@ -39,9 +39,7 @@ const storydelete = expressAsyncHandler(async (req, res) => {
 
 const getstories = expressAsyncHandler(async (req, res) => {
     try {
-        // Fetch all stories and populate the 'user' field with user information
         const stories = await Story.find().populate('user', '-password');
-
         res.status(200).json(stories);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch stories", error: error.message });

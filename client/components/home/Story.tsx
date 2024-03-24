@@ -13,18 +13,21 @@ const Story = () => {
   const [stories, setStories] = useState([]);
   const fetchstories = async () => {
     try {
+      console.log("hello fgrons stories");
+      
       const response = await makeAuthenticatedGETRequest("/getallstories");
-      console.log(response);
+      console.log("hello",response);
       setStories(response);
-    } catch (err) {
+    } catch (error) {
       console.log("error in fetching stories", error.message);
     }
   };
 
   useEffect(() => {
-    fetchstories();
-    console.log("stories from useeffect", stories);
-  }, []);
+    if (stories.length === 0) {
+      fetchstories();
+    }
+  }, [stories]);
 
   return (
     <div className="w-full py-4">
