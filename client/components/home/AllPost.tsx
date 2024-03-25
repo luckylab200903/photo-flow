@@ -1,4 +1,8 @@
-import { cn, makeAuthenticatedGETRequest } from "@/lib/utils";
+import {
+  cn,
+  makeAuthenticatedGETRequest,
+  makeAuthenticatedPOSTRequest,
+} from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Carousel,
@@ -14,75 +18,13 @@ import { Separator } from "@radix-ui/react-separator";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 
-// const posts = [
-//   {
-//     userImg: "https://github.com/shadcn.png",
-//     userName: "Jhon Doe",
-//     postedOn: "2h",
-//     postCaption:
-//       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-//     images: [
-//       "/img/sample/a.jpg",
-//       "/img/sample/d.jpg",
-//       "/img/sample/b.jpg",
-//       "/img/sample/c.jpg",
-//     ],
-//   },
-//   {
-//     userImg: "https://github.com/shadcn.png",
-//     userName: "Jhon Doe",
-//     postedOn: "2h",
-//     postCaption:
-//       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-//     images: [
-//       "/img/sample/a.jpg",
-//       "/img/sample/b.jpg",
-//       "/img/sample/c.jpg",
-//       "/img/sample/d.jpg",
-//     ],
-//   },
-//   {
-//     userImg: "https://github.com/shadcn.png",
-//     userName: "Jhon Doe",
-//     postedOn: "2h",
-//     postCaption:
-//       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-//     images: [
-//       "/img/sample/a.jpg",
-//       "/img/sample/b.jpg",
-//       "/img/sample/c.jpg",
-//       "/img/sample/d.jpg",
-//     ],
-//   },
-//   {
-//     userImg: "https://github.com/shadcn.png",
-//     userName: "Jhon Doe",
-//     postedOn: "2h",
-//     postCaption:
-//       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-//     images: [
-//       "/img/sample/a.jpg",
-//       "/img/sample/b.jpg",
-//       "/img/sample/c.jpg",
-//       "/img/sample/d.jpg",
-//     ],
-//   },
-//   {
-//     userImg: "https://github.com/shadcn.png",
-//     userName: "Jhon Doe",
-//     postedOn: "2h",
-//     postCaption:
-//       "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-//     images: [
-//       "/img/sample/a.jpg",
-//       "/img/sample/b.jpg",
-//       "/img/sample/c.jpg",
-//       "/img/sample/d.jpg",
-//     ],
-//   },
-// ];
-
-const AllPost = ({ className }: { className: string }) => {
+const AllPost = ({
+  className,
+  userId,
+}: {
+  className: string;
+  userId: string;
+}) => {
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -109,16 +51,18 @@ const AllPost = ({ className }: { className: string }) => {
   return (
     <div className={cn(className, "py-4 flex flex-col gap-5")}>
       {posts.map((post, i) => (
-        <Post key={i} post={post} />
+        <Post key={i} post={post} userId={userId} />
       ))}
     </div>
   );
 };
 
-const Post = ({ post }: { post: (typeof posts)[0] }) => {
-  const [liked, setLiked] = useState<boolean>(false);
+const Post = ({ post, userId }: { post: any; userId: string }) => {
+  const [liked, setLiked] = useState<boolean>(post.likes.includes(userId));
+  //const [likedstate, setLikedstate] = useState(post.likes.includes(userId));
   const [showComment, setShowComment] = useState<boolean>(false);
-
+  const [likecount, setLikecount] = useState(post.likes.length);
+  const [commentcount, setCommentcount] = useState(0);
   const timeDifference = (current, previous) => {
     const msPerMinute = 60 * 1000;
     const msPerHour = msPerMinute * 60;
@@ -137,9 +81,46 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
     }
   };
 
+  const handlelikeunlike = async () => {
+    try {
+      if (liked) {
+        const response = await makeAuthenticatedPOSTRequest("/addpostdislike", {
+          postId: post._id,
+          userId,
+        });
+
+        if (response && response.success) {
+          setLiked(false);
+          setLikecount((prev) => prev - 1);
+        } else {
+          console.error("Failed to remove like:", response.message);
+        }
+      } else {
+        const endpoint = liked ? "/addpostdislike" : "/addlikepost";
+        const response = await makeAuthenticatedPOSTRequest(endpoint, {
+          postId: post._id,
+          userId,
+        });
+
+        if (response && response.success) {
+          setLiked(!liked);
+          setLikecount((prev) => (liked ? prev - 1 : prev + 1));
+        } else {
+          console.error(
+            `Failed to ${liked ? "remove" : "add"} like:`,
+            response.message
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error.message);
+    }
+  };
+
   const currentTime = new Date();
   const updatedAt = new Date(post.updatedAt);
   const timeAgo = timeDifference(currentTime, updatedAt);
+
   return (
     <div className="w-full bg-light rounded-lg pb-3 px-2 md:p-5">
       <div className="flex items-center gap-2 md:gap-4">
@@ -148,7 +129,7 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
             src={post.user.profilepicture}
             alt={post.user.profilepicture}
           />
-          <AvatarFallback>{post.user.username.substring(2)}</AvatarFallback>
+          <AvatarFallback>{post.user.username.substring(0, 2)}</AvatarFallback>
         </Avatar>
         <div>
           <p className="font-bold text-sm">{post.user.username}</p>
@@ -182,7 +163,7 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
       <div className="flex justify-end md:px-5">
         <div className="flex items-center gap-2 justify-between">
           <h4 className="scroll-m-20 text-sm md:text-xl tracking-tight">
-            3.5k
+            {commentcount}
           </h4>
           <Button
             variant="ghost"
@@ -191,9 +172,9 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
             <Icons.chat className="md:w-9 w-7 p-1 fill-none" />
           </Button>
           <h4 className="scroll-m-20 text-sm md:text-xl tracking-tight">
-            19.8k
+            {likecount}
           </h4>
-          <Button variant="ghost" onClick={() => setLiked((prev) => !prev)}>
+          <Button variant="ghost" onClick={handlelikeunlike}>
             {liked ? (
               <Icons.heart className="md:w-9 w-7 p-1 fill-red-600 stroke-red-600" />
             ) : (
@@ -214,7 +195,6 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
               className="w-full min-h-[35px] bg-light border-none rounded-lg p-2"
               rows={1}
             />
-
             <Button variant="ghost">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -266,26 +246,5 @@ const Post = ({ post }: { post: (typeof posts)[0] }) => {
     </div>
   );
 };
+
 export default AllPost;
-
-//   const fetchData = async () => {
-//     try {
-//       const response = await makeAuthenticatedGETRequest("/all/getallposts");
-
-//       if (!response) {
-//         console.log("No response received");
-//         return;
-//       }
-
-//       console.log("Posts data:", response);
-
-//       setPosts(response);
-//     } catch (error) {
-//       console.error("Error in getting the posts:", error.message);
-//     }
-//   };
-//   const [posts, setPosts] = useState([]);
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);

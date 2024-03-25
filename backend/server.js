@@ -7,7 +7,7 @@ const connectToMongoDB = require("./connectDB/connect");
 const searchRoute = require("./routes/searchRoute");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoute");
-const cloudRoutes = require("./routes/cloudRoutes");
+const likepostRoutes=require("./routes/likepostRoute")
 const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 const getallpost = require("./routes/getpostRoute");
@@ -15,7 +15,7 @@ const upload = require("./middleware/multer");
 const postRoutes = require("./routes/postRoute");
 const storyRoutes = require("./routes/storyRoutes");
 const usergetroutes = require("./routes/usergetRoutes");
-const addfriendRoutes=require("./routes/addfriendsRoute")
+const addfriendRoutes = require("./routes/addfriendsRoute");
 const fs = require("fs");
 const multer = require("multer");
 const bodyParser = require("body-parser");
@@ -39,7 +39,8 @@ app.use("/api", storyRoutes);
 app.use("/api", notificationRoutes);
 app.use("/api/all", getallpost);
 app.use("/api", usergetroutes);
-app.use("/api",addfriendRoutes)
+app.use("/api", addfriendRoutes);
+app.use("/api", likepostRoutes);
 
 const port = process.env.PORT || 5000;
 try {

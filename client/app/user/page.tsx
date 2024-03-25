@@ -5,9 +5,12 @@ import { Separator } from "@/components/ui/separator";
 import PostCarousel from "@/components/user/PostCarousel";
 import ProfilePic from "@/components/user/ProfilePic";
 import { useAppSelector } from "@/lib/hooks";
+import { useDispatch } from 'react-redux'; // Add this import
 
 const UserPage = () => {
   const userData = useAppSelector((state) => state.user.data);
+  console.log("userData", userData);
+  const dispatch = useDispatch(); // Initialize useDispatch
 
   return (
     <div className="md:pl-28 pt-10 pb-20 md:pb-0 md:flex">
@@ -23,14 +26,14 @@ const UserPage = () => {
         <div className="flex justify-center h-5 items-center space-x-4 text-sm">
           <div className="flex items-center flex-col">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-              102
+              {userData.posts && userData.posts.length}
             </h3>
             <small className="text-sm font-medium leading-none">Posts</small>
           </div>
           <Separator orientation="vertical" className="bg-dark h-8" />
           <div className="flex items-center flex-col">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-              54,000
+              {userData.followers && userData.followers.length}
             </h3>
             <small className="text-sm font-medium leading-none">
               Followers
@@ -39,7 +42,7 @@ const UserPage = () => {
           <Separator orientation="vertical" className="bg-dark h-8" />
           <div className="flex items-center flex-col">
             <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-              1,002
+              {userData.followings && userData.followings.length}
             </h3>
             <small className="text-sm font-medium leading-none">
               Following

@@ -28,19 +28,15 @@ const Connections = () => {
   };
 
   const handleAddFriend = async (friendId) => {
-    console.log(friendId);
     try {
       const response = await makeAuthenticatedPOSTRequest("/addfriends", {
         friendId,
       });
       console.log(response);
 
-      if (response.status === 200) {
-        console.log("Friend added successfully");
-        fetchConnectionsDetails();
-      } else {
-        console.error("Failed to add friend:", response.data.message);
-      }
+      console.log("FriendId:", friendId);
+      console.log("Response:", response);
+      fetchConnectionsDetails();
     } catch (error) {
       console.error("Error adding friend:", error.message);
     }
