@@ -5,13 +5,12 @@ import { Separator } from "@/components/ui/separator";
 import PostCarousel from "@/components/user/PostCarousel";
 import ProfilePic from "@/components/user/ProfilePic";
 import { useAppSelector } from "@/lib/hooks";
-import { useDispatch } from 'react-redux'; // Add this import
+import { useDispatch } from 'react-redux'; 
 
 const UserPage = () => {
   const userData = useAppSelector((state) => state.user.data);
   console.log("userData", userData);
-  const dispatch = useDispatch(); // Initialize useDispatch
-
+  const dispatch = useDispatch(); 
   return (
     <div className="md:pl-28 pt-10 pb-20 md:pb-0 md:flex">
       <Navbar />

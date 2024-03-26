@@ -1,4 +1,3 @@
-
 const expressAsyncHandler = require("express-async-handler");
 const Post = require("../models/postModel");
 
@@ -8,14 +7,14 @@ const addpostlike = expressAsyncHandler(async (req, res) => {
 
     const post = await Post.findById(postId);
 
-    if (post.likes.includes(userId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User already liked this post" });
+    if (!post.likes.includes(userId)) {
+      post.likes.push(userId);
+      await post.save();
     }
 
-    post.likes.push(userId);
-    await post.save();
+    return res
+      .status(400)
+      .json({ success: false, message: "User already liked this post" });
 
     res.status(200).json({ success: true, message: "Like added successfully" });
   } catch (error) {
@@ -27,17 +26,14 @@ const addpostlike = expressAsyncHandler(async (req, res) => {
 const addpostdislike = expressAsyncHandler(async (req, res) => {
   try {
     const { postId, userId } = req.body;
-
     const post = await Post.findById(postId);
-
-    if (post.dislikes.includes(userId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User already disliked this post" });
+    if (!post.dislikes.includes(userId)) {
+      post.dislikes.push(userId);
+      await post.save();
     }
-
-    post.dislikes.push(userId);
-    await post.save();
+    return res
+      .status(400)
+      .json({ success: false, message: "User already disliked this post" });
 
     res
       .status(200)
@@ -48,4 +44,4 @@ const addpostdislike = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { addpostdislike,addpostlike };
+module.exports = { addpostdislike, addpostlike };

@@ -1,78 +1,61 @@
 const expressAsync = require("express-async-handler");
 const Comment = require("../models/commentModel");
-const User = require("../models/userModel");
+const Post = require("../models/postModel");
 
 const commentAdd = expressAsync(async (req, res) => {
-  const { comment, id } = req.body;
-  if (!comment) {
-    return res.status(402).json({
-      message: "Please add comment",
+  const { comment, userId, postId } = req.body;
+  if (!comment || !userId || !postId) {
+    return res.status(400).json({
+      message: "Please provide comment content, user ID, and post ID",
     });
   }
+
   try {
     const newComment = await Comment.create({
       text: comment,
-      user: req.user._id,
+      user: userId,
     });
-    res.status(201).json(newComment);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to add comment", error: error.message });
-  }
-});
+    // Populate the 'user' field of the new comment
+    await newComment.populate('user')
 
-const commentdelete = expressAsync(async (req, res) => {
-  const { id } = req.body;
-  try {
-    const comment = await Comment.findByIdAndDelete(id);
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-    res.status(200).json({ message: "Comment deleted successfully", comment });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to delete comment", error: error.message });
-  }
-});
-
-const updatecomment = expressAsync(async (req, res) => {
-  const { id, newComment } = req.body;
-
-  try {
-    const comment = await Comment.findByIdAndUpdate(
-      id,
-      { text: newComment },
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: {
+          comments: {
+            user: userId,
+            text: comment,
+            _id: newComment._id,
+          },
+        },
+      }, 
       { new: true }
-    );
+    ).populate('comments.user'); 
 
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-    res.status(200).json({ message: "Comment updated successfully", comment });
+    res.status(200).json(updatedPost);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error in updating the comment", error: error.message });
+    console.error("Error adding comment:", error);
+    res.status(500).json({ message: "Failed to add comment", error: error.message });
   }
 });
 
-const likecomment = expressAsync(async (req, res) => {
-  const { id } = req.body;
+
+const allComments = expressAsync(async (req, res) => {
+  const { postId } = req.params;
   try {
-    const comment = await Comment.findById(id);
-    if (!comment) {
-      return res.status(405).json({ message: "Comment not found" });
+    const post = await Post.findById(postId)
+      .populate({
+        path: 'comments',
+        populate: { path: 'user' } // Populate the 'user' field within the 'comments' array
+      })
+      .populate('user'); // Populate the 'user' field of the post itself
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
     }
-    comment.likes.push(req.user._id);
-    await comment.save();
-    res.status(200).json({ message: "Comment liked successfully", comment });
+    res.status(200).json(post.comments);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to like comment", error: error.message });
+    res.status(500).json({ message: "Failed to retrieve comments", error: error.message });
   }
 });
 
-module.exports = { commentAdd, commentdelete, updatecomment, likecomment };
+module.exports = { commentAdd, allComments };

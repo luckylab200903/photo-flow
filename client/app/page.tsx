@@ -21,7 +21,8 @@ export default function Home() {
       redirect("/signin");
     }
   }, []);
-
+  // const userData = useAppSelector((state) => state.user.data);
+  // console.log("userData from home page", userData);
   return (
     <div className="relative rounded-lg md:flex md:justify-between md:pl-24 bg-gray min-h-screen w-screen">
       <div className="w-full h-screen overflow-scroll md:pr-5">
@@ -30,7 +31,7 @@ export default function Home() {
           <SearchBar />
         </div>
         <AddPost />
-        <AllPost className="px-5 w-full" />
+        <AllPost className="px-5 w-full"/>
       </div>
       <Sidebar />
       <Navbar />
