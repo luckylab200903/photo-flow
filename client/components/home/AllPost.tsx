@@ -82,7 +82,7 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
   const getToken = () => {
     const accessToken = document.cookie.replace(
       /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
+      "$1",
     );
     return accessToken;
   };
@@ -141,6 +141,7 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
     });
   }, []);
   const handlelikeunlike = async () => {
+    setLiked((prev) => !prev);
     try {
       if (liked) {
         const response = await makeAuthenticatedPOSTRequest("/addpostdislike", {
@@ -149,7 +150,6 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
         });
 
         if (response && response.success) {
-          setLiked(false);
           setLikecount((prev) => prev - 1);
         } else {
           console.error("Failed to remove like:", response.message);
@@ -162,7 +162,6 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
         });
 
         if (response && response.success) {
-          setLiked(true); // Set liked to true when adding like
           setLikecount((prev) => prev + 1); // Increment like count
         } else {
           console.error("Failed to add like:", response.message);
