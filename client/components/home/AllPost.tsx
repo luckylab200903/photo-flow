@@ -87,7 +87,7 @@ const Post = ({ post }: { post: any; userId: string }) => {
   const getToken = () => {
     const accessToken = document.cookie.replace(
       /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
+      "$1",
     );
     return accessToken;
   };
@@ -131,6 +131,7 @@ const Post = ({ post }: { post: any; userId: string }) => {
     fetchUserData();
   }, [userId]);
   const handlelikeunlike = async () => {
+    setLiked((prev) => !prev);
     try {
       if (liked) {
         const response = await makeAuthenticatedPOSTRequest("/addpostdislike", {
@@ -139,7 +140,6 @@ const Post = ({ post }: { post: any; userId: string }) => {
         });
 
         if (response && response.success) {
-          setLiked(false);
           setLikecount((prev) => prev - 1);
         } else {
           console.error("Failed to remove like:", response.message);
@@ -152,7 +152,6 @@ const Post = ({ post }: { post: any; userId: string }) => {
         });
 
         if (response && response.success) {
-          setLiked(true); // Set liked to true when adding like
           setLikecount((prev) => prev + 1); // Increment like count
         } else {
           console.error("Failed to add like:", response.message);
@@ -304,18 +303,19 @@ const Post = ({ post }: { post: any; userId: string }) => {
           </div>
           <Separator className="bg-gray md:w-[90%] mx-auto my-3 md:h-[2px]" />
           <div className="flex flex-col gap-2">
-            {comments && comments.map((comment, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Avatar className="border-2 border-gray w-8 h-8 md:w-10 md:h-10">
-                  <AvatarImage src={comment.user.profilepicture} alt="" />
-                  <AvatarFallback>
-                    {comment.user.username.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-sm">{comment.text}</p>
-                <p className="text-xs text-gray-400">{comment.createdAt}</p>
-              </div>
-            ))}
+            {comments &&
+              comments.map((comment, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Avatar className="border-2 border-gray w-8 h-8 md:w-10 md:h-10">
+                    <AvatarImage src={comment.user.profilepicture} alt="" />
+                    <AvatarFallback>
+                      {comment.user.username.substring(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="text-sm">{comment.text}</p>
+                  <p className="text-xs text-gray-400">{comment.createdAt}</p>
+                </div>
+              ))}
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import React from "react";
 import Conversation from "@/components/chat/Conversation";
+import Messages from "@/components/chat/Messages";
 import Navbar from "@/components/Navbar";
 
 const Chat = () => {
@@ -7,7 +8,7 @@ const Chat = () => {
     <div className="md:pl-20">
       <Navbar />
       <div className="flex bg-white dark:bg-gray-900">
-        <div className="w-screen md:w-80 h-screen dark:bg-gray-800 bg-gray-100 p-2">
+        <div className="w-80 h-screen dark:bg-gray-800 bg-gray-100 p-2 hidden md:block">
           <div className="h-full overflow-y-auto">
             <div className="text-xl text-gray-600 dark:text-gray-200 p-3">
               Messages
@@ -37,8 +38,8 @@ const Chat = () => {
             <Conversation />
           </div>
         </div>
-        <div className="flex-grow hidden md:block h-screen p-2 rounded-md">
-          <BlankMessageArea />
+        <div className="flex-grow  h-screen p-2 rounded-md">
+          <Messages />
         </div>
       </div>
     </div>
@@ -46,16 +47,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
-const BlankMessageArea = () => {
-  return (
-    <div className="flex flex-col items-center justify-center h-full">
-      <div className="text-4xl text-gray-400 dark:text-gray-300">
-        No messages
-      </div>
-      <div className="text-gray-500 dark:text-gray-400">
-        Start a conversation
-      </div>
-    </div>
-  );
-};
