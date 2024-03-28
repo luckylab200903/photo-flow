@@ -14,6 +14,9 @@ const config = {
       },
     },
   },
+  width: {
+    '35': '35%', 
+  },
 } satisfies Config;
 
 export default config;

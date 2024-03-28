@@ -1,4 +1,5 @@
 const express = require("express");
+const { Server } = require("socket.io");
 const jwtpassport = require("./connectDB/jwtpassport");
 const userRoutes = require("./routes/userRoutes");
 const commentRoute = require("./routes/commentRoute");
@@ -7,7 +8,7 @@ const connectToMongoDB = require("./connectDB/connect");
 const searchRoute = require("./routes/searchRoute");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoute");
-const likepostRoutes=require("./routes/likepostRoute")
+const likepostRoutes = require("./routes/likepostRoute");
 const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 const getallpost = require("./routes/getpostRoute");
@@ -22,6 +23,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 require("dotenv").config();
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json({ extended: false }));
@@ -42,13 +44,36 @@ app.use("/api", usergetroutes);
 app.use("/api", addfriendRoutes);
 app.use("/api", likepostRoutes);
 
-const port = process.env.PORT || 5000;
-try {
-  app.listen(port, () => {
-    console.log(`Server is listening on the port ${port}`);
-    console.log(process.env.MONGO_URI);
-    connectToMongoDB(process.env.MONGO_URI);
+const server = app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server is listening on port ${server.address().port}`);
+  console.log(process.env.MONGO_URI);
+  connectToMongoDB(process.env.MONGO_URI);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  },
+});
+// Assuming you have functions to handle likes and comments
+const handleLike = (postId, userId) => {
+  // Logic to handle like
+  // Emit Socket.io event
+  io.emit('like', { postId, userId });
+};
+
+const handleComment = (postId, userId) => {
+  // Logic to handle comment
+  // Emit Socket.io event
+  io.emit('comment', { postId, userId });
+};
+
+io.on("connection", (socket) => {
+  //console.log(socket);
+  //console.log("someone has connected");
+  //io.emit("firstevent"," hello this is keshav kumar singh from socket io")
+  socket.on("disconnect", () => {
+    console.log("someone has disconnected");
   });
-} catch (error) {
-  console.log(error);
-}
+});
+

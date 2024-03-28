@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Cookies from "js-cookie";
+import { io } from "socket.io-client";
 import Image from "next/image";
 import { Icons } from "../ui/icons";
 import { useEffect, useState } from "react";
@@ -21,13 +22,7 @@ import { Textarea } from "../ui/textarea";
 import { jwtDecode } from "jwt-decode";
 import { backendURl } from "@/lib/backend";
 
-const AllPost = ({
-  className,
-  userId,
-}: {
-  className: string;
-  userId: string;
-}) => {
+const AllPost = ({ className, socket }: { className: string; socket: any }) => {
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -54,13 +49,13 @@ const AllPost = ({
   return (
     <div className={cn(className, "py-4 flex flex-col gap-5")}>
       {posts.map((post, i) => (
-        <Post key={i} post={post} />
+        <Post key={i} post={post} socket={socket} />
       ))}
     </div>
   );
 };
 
-const Post = ({ post }: { post: any; userId: string }) => {
+const Post = ({ post, socket }: { post: any; socket: any }) => {
   const [liked, setLiked] = useState(false);
   const [showComment, setShowComment] = useState<boolean>(false);
   const [likecount, setLikecount] = useState(post.likes.length);
@@ -130,6 +125,21 @@ const Post = ({ post }: { post: any; userId: string }) => {
 
     fetchUserData();
   }, [userId]);
+  useEffect(() => {
+    socket.on("like", (data) => {
+      const { postId, userId } = data;
+      console.log(`User ${userId} liked post ${postId}`);
+    });
+
+    socket.on("comment", (data) => {
+      const { postId, userId } = data;
+      console.log(`User ${userId} commented on post ${postId}`);
+    });
+
+    socket.on("firstevent", (message) => {
+      console.log("Received message:", message);
+    });
+  }, []);
   const handlelikeunlike = async () => {
     try {
       if (liked) {
@@ -184,6 +194,11 @@ const Post = ({ post }: { post: any; userId: string }) => {
       console.log("Comment added successfully:", response);
       setTextareaValue("");
       //setCommentcount((prev) => prev + 1);
+      socket.emit("comment", {
+        postId: post._id,
+        userId,
+        comment: textareaValue,
+      });
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -304,18 +319,19 @@ const Post = ({ post }: { post: any; userId: string }) => {
           </div>
           <Separator className="bg-gray md:w-[90%] mx-auto my-3 md:h-[2px]" />
           <div className="flex flex-col gap-2">
-            {comments && comments.map((comment, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <Avatar className="border-2 border-gray w-8 h-8 md:w-10 md:h-10">
-                  <AvatarImage src={comment.user.profilepicture} alt="" />
-                  <AvatarFallback>
-                    {comment.user.username.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-sm">{comment.text}</p>
-                <p className="text-xs text-gray-400">{comment.createdAt}</p>
-              </div>
-            ))}
+            {comments &&
+              comments.map((comment, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Avatar className="border-2 border-gray w-8 h-8 md:w-10 md:h-10">
+                    <AvatarImage src={comment.user.profilepicture} alt="" />
+                    <AvatarFallback>
+                      {comment.user.username.substring(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="text-sm">{comment.text}</p>
+                  <p className="text-xs text-gray-400">{comment.createdAt}</p>
+                </div>
+              ))}
           </div>
         </div>
       )}

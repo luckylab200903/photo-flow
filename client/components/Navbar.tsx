@@ -4,7 +4,7 @@ import { Icons } from "@/components/ui/icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const Navbar = () => {
+const Navbar = ({socket}) => {
   const pathname = usePathname();
 
   return (

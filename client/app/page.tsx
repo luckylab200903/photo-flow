@@ -1,28 +1,26 @@
-"use client";
+"use client"
+import React, { useEffect } from "react";
+import io from "socket.io-client";
+import Cookies from "js-cookie";
+import { redirect } from "next/navigation";
 import AllPost from "@/components/home/AllPost";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/home/Sidebar";
 import Story from "@/components/home/Story";
-import { counterSlice } from "@/lib/features/countSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import AddPost from "@/components/home/AddPost";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 import SearchBar from "@/components/SearchBar";
-import { redirect, usePathname } from "next/navigation";
-import { useEffect } from "react";
 
-import Cookies from "js-cookie";
 export default function Home() {
-  const dispatch = useAppDispatch();
-
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token || token === "undefined") {
       redirect("/signin");
     }
   }, []);
-  // const userData = useAppSelector((state) => state.user.data);
-  // console.log("userData from home page", userData);
+
+  // Create Socket.io client instance
+  const socket = io("http://localhost:5001");
+
   return (
     <div className="relative rounded-lg md:flex md:justify-between md:pl-24 bg-gray min-h-screen w-screen">
       <div className="w-full h-screen overflow-scroll md:pr-5">
@@ -31,10 +29,10 @@ export default function Home() {
           <SearchBar />
         </div>
         <AddPost />
-        <AllPost className="px-5 w-full"/>
+        <AllPost className="px-5 w-full" socket={socket} />
       </div>
       <Sidebar />
-      <Navbar />
+      <Navbar socket={socket} />
     </div>
   );
 }
