@@ -13,7 +13,7 @@ const initialState: userSliceState = {
     password: "",
     profilepicture: "",
     username: "",
-    posts:[]
+    posts: []
   },
 };
 
@@ -37,8 +37,8 @@ export const userSlice = createSlice({
     updateUserProfile: (state, action: PayloadAction<string>) => {
       state.data.profilepicture = action.payload;
     },
-    updateUserPosts(state, action:PayloadAction<string>) {
-      state.data.posts = action.payload; 
+    updateUserPosts(state, action: PayloadAction<string>) {
+      state.data.posts = action.payload;
     },
   },
 });

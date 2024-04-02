@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ConversationItem from "./ConversationItem";
+import { usePathname } from "next/navigation";
+import { makeAuthenticatedGETRequest } from "@/lib/utils";
 
 const data = [
   {
@@ -46,16 +48,35 @@ const data = [
   },
 ];
 
-const Conversation = () => {
+const Conversation = ({ chats }) => {
+  // const latestMessageCreatedAt = chat.latestMessage.createdAt;
+  // console.log(latestMessageCreatedAt);
+  const [chati, setChati] = useState([]);
+  const pathname = usePathname();
+  console.log(pathname);
+
+  const fetchChats = async () => {
+    try {
+      const chatsData = await makeAuthenticatedGETRequest("/getchat");
+      console.log(chatsData);
+      setChati(chatsData);
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+    }
+  };
+  useEffect(() => {
+    fetchChats();
+  }, []);
   return (
     <div className="p-1">
-      {data.map((item, index) => (
+      {chats && chats?.map((chat, index, key) => (
         <ConversationItem
-          _id={item._id}
-          message={item.message}
-          time={item.time}
-          name={item.name}
-          image={item.avatar_src}
+          _id={chat._id}
+          key={chat._id}
+          message={chat.latestmessage}
+          time={chat?.latestMessage?.createdAt}
+          name={chat.users[1].name}
+          image={chat.users[1].profilepicture}
         />
       ))}
     </div>

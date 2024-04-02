@@ -4,6 +4,8 @@ const User = require("../models/userModel.js");
 
 const makeChat = expressAsyncHandler(async (req, res) => {
   const { userId } = req.body;
+  console.log("logged in user", req.user._id);
+  console.log("opposite user", userId);
   if (!userId) {
     console.log("userID is not present with the request");
     return res
@@ -21,7 +23,7 @@ const makeChat = expressAsyncHandler(async (req, res) => {
     })
       .populate("users", "-password")
       .populate("latestMessage.sender", "name email");
-
+    // console.log(users);
     if (isChat) {
       res.status(200).send(isChat);
     } else {
@@ -37,7 +39,8 @@ const makeChat = expressAsyncHandler(async (req, res) => {
         .populate("users", "-password")
         .populate("latestMessage.sender", "name email");
 
-      res.status(200).send(fullChat);
+      // res.status(200).send(fullChat);
+      res.status(200).send(createdChat);
     }
   } catch (error) {
     console.error(error.message);

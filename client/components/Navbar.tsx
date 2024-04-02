@@ -1,12 +1,24 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn, makeAuthenticatedGETRequest } from "@/lib/utils";
 import { Icons } from "@/components/ui/icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 
 const Navbar = ({socket}) => {
   const pathname = usePathname();
-
+  // const [chat,setchats]=useState([])
+  // const fetchchat = async () => {
+  //   try {
+  //     const chatsData = await makeAuthenticatedGETRequest("/getchat");
+  //     console.log("data for chats");
+      
+  //     console.log(chatsData);
+  //     setchats(chatsData);
+  //   } catch (error) {
+  //     console.error("Error fetching chats:", error);
+  //   }
+  // };
   return (
     <div className="fixed left-0 bottom-0 md:top-0 flex px-5 py-3 drop-shadow-[-0_-5px_35px_rgba(0,0,0,0.15)] w-screen justify-around bg-light md:flex-col md:w-20 md:h-screen md:items-center md:justify-center md:gap-12">
       {pathname === "/" ? (
@@ -55,8 +67,10 @@ const Navbar = ({socket}) => {
         </Link>
       )}
       {pathname === "/chat" ? (
-        <div className={activeTabStyle}>
+        <div onClick={()=>{
+          console.log("object")}} className={activeTabStyle}>
           <Icons.chatFilled
+
             className={cn(
               tabStyle,
               "fill-surface md:fill-none md:stroke-overlay",
@@ -66,7 +80,7 @@ const Navbar = ({socket}) => {
         </div>
       ) : (
         <Link className={linkStyle} href="/chat">
-          <Icons.chat className={cn(tabStyle)} />
+          <Icons.chat className={cn(tabStyle)}  />
         </Link>
       )}
       {pathname === "/user" ? (

@@ -1,31 +1,28 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from "react";
 import Conversation from "@/components/chat/Conversation";
 import Navbar from "@/components/Navbar";
 import { Socket } from "socket.io-client";
-import Leftpart from "./Leftpart";
-import Rightpart from "./Rightpart";
+import { usePathname } from "next/navigation";
+import { makeAuthenticatedGETRequest } from "@/lib/utils";
 
 const Chat = () => {
+  const [chats, setChats] = useState([]);
+  const pathname = usePathname();
+  console.log(pathname);
+  const fetchChats = async () => {
+    try {
+      const chatsData = await makeAuthenticatedGETRequest("/getchat");
+      console.log(chatsData);
+      setChats(chatsData);
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+    }
+  };
+  useEffect(() => {
+    fetchChats();
+  }, []);
   return (
-<<<<<<< HEAD
-    <div className=" h-screen overflow-hidden">
-      <div className="flex h-full">
-        <div className="md:ml-20 pt-5 px-5 hidden sm:block w-[35%] overflow-y-auto mb-2">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"></h1>
-          <div className="relative h-full">
-            <Leftpart />
-          </div>
-        </div>
-
-        <div className="h-full w-full sm:w-[65%] mt-4 mr-5 overflow-hidden">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl"></h1>
-          <div className="relative  h-full mb-5">
-            <Rightpart />
-          </div>
-        </div>
-      </div>
-      <Navbar />
-=======
     <div className="md:pl-20">
       <Navbar />
       <div className="flex bg-white dark:bg-gray-900">
@@ -56,21 +53,17 @@ const Chat = () => {
                 </svg>
               </div>
             </div>
-            <Conversation />
+            <Conversation chats={chats}/>
           </div>
         </div>
         <div className="flex-grow hidden md:block h-screen p-2 rounded-md">
           <BlankMessageArea />
         </div>
       </div>
->>>>>>> 278b3ccb23889b875d0d04345899166a7829bb7e
     </div>
   );
 };
 
-<<<<<<< HEAD
-export default ChatPage;
-=======
 export default Chat;
 
 const BlankMessageArea = () => {
@@ -85,4 +78,3 @@ const BlankMessageArea = () => {
     </div>
   );
 };
->>>>>>> 278b3ccb23889b875d0d04345899166a7829bb7e

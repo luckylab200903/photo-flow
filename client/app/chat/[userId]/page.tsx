@@ -1,9 +1,36 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Conversation from "@/components/chat/Conversation";
 import Messages from "@/components/chat/Messages";
 import Navbar from "@/components/Navbar";
+import { makeAuthenticatedGETRequest } from "@/lib/utils";
 
+import { usePathname } from "next/navigation";
 const Chat = () => {
+  const [chats, setChats] = useState([]);
+  const pathname = usePathname();
+  console.log(pathname);
+  
+  const fetchChats = async () => {
+    try {
+      const chatsData = await makeAuthenticatedGETRequest("/getchat");
+      console.log(chatsData);
+      setChats(chatsData);
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+    }
+  };
+    useEffect(() => {
+    fetchChats();
+  }, [pathname]);
+
+
+  
+  useEffect(() => {
+    console.log("calling from useEffect");
+    fetchChats();
+  }, []);
+
   return (
     <div className="md:pl-20">
       <Navbar />
