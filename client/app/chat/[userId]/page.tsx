@@ -3,33 +3,19 @@ import React, { useEffect, useState } from "react";
 import Conversation from "@/components/chat/Conversation";
 import Messages from "@/components/chat/Messages";
 import Navbar from "@/components/Navbar";
-import { makeAuthenticatedGETRequest } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { FetchAllConversation } from "@/lib/actions/chatActions";
 
 import { usePathname } from "next/navigation";
 const Chat = () => {
-  const [chats, setChats] = useState([]);
+  const dispatch = useAppDispatch();
   const pathname = usePathname();
-  console.log(pathname);
-  
-  const fetchChats = async () => {
-    try {
-      const chatsData = await makeAuthenticatedGETRequest("/getchat");
-      console.log(chatsData);
-      setChats(chatsData);
-    } catch (error) {
-      console.error("Error fetching chats:", error);
-    }
-  };
-    useEffect(() => {
-    fetchChats();
-  }, [pathname]);
 
+  const conversation = useAppSelector((state) => state.conversation);
 
-  
   useEffect(() => {
-    console.log("calling from useEffect");
-    fetchChats();
-  }, []);
+    dispatch(FetchAllConversation());
+  }, [dispatch]);
 
   return (
     <div className="md:pl-20">
@@ -62,7 +48,7 @@ const Chat = () => {
                 </svg>
               </div>
             </div>
-            <Conversation />
+            <Conversation chats={conversation.data} />
           </div>
         </div>
         <div className="flex-grow  h-screen p-2 rounded-md">

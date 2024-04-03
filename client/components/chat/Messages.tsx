@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useAppDispatch } from "@/lib/hooks";
+import { FetchMessages } from "@/lib/actions/chatActions";
+import { usePathname } from "next/navigation";
 
 const messages_data = [
   {
@@ -36,6 +39,14 @@ const messages_data = [
 ];
 
 const Messages = () => {
+  const dispatch = useAppDispatch();
+  const pathname = usePathname();
+  const msgId = pathname.split("/")[2];
+
+  useEffect(() => {
+    dispatch(FetchMessages(msgId));
+  }, [dispatch, msgId]);
+
   return (
     <div className="flex-grow h-full flex flex-col relative w-full">
       <div className="w-full h-15 p-1">

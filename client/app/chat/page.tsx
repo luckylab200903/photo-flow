@@ -1,27 +1,21 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Conversation from "@/components/chat/Conversation";
 import Navbar from "@/components/Navbar";
-import { Socket } from "socket.io-client";
 import { usePathname } from "next/navigation";
-import { makeAuthenticatedGETRequest } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { FetchAllConversation } from "@/lib/actions/chatActions";
 
 const Chat = () => {
-  const [chats, setChats] = useState([]);
+  const dispatch = useAppDispatch();
   const pathname = usePathname();
-  console.log(pathname);
-  const fetchChats = async () => {
-    try {
-      const chatsData = await makeAuthenticatedGETRequest("/getchat");
-      console.log(chatsData);
-      setChats(chatsData);
-    } catch (error) {
-      console.error("Error fetching chats:", error);
-    }
-  };
+
+  const conversation = useAppSelector((state) => state.conversation);
+
   useEffect(() => {
-    fetchChats();
-  }, []);
+    dispatch(FetchAllConversation());
+  }, [dispatch]);
+
   return (
     <div className="md:pl-20">
       <Navbar />
@@ -53,7 +47,7 @@ const Chat = () => {
                 </svg>
               </div>
             </div>
-            <Conversation chats={chats}/>
+            <Conversation chats={conversation.data} />
           </div>
         </div>
         <div className="flex-grow hidden md:block h-screen p-2 rounded-md">
