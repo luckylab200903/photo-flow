@@ -20,3 +20,13 @@ const config = {
 } satisfies Config;
 
 export default config;
+// module.exports = {
+//   async rewrites() {
+//       return [
+//         {
+//           source: '/api/:path*',
+//           destination: 'http://localhost:.example.com/:path*',
+//         },
+//       ]
+//     },
+// };

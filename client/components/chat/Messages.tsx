@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { FetchMessages } from "@/lib/actions/chatActions";
 import { usePathname } from "next/navigation";
+import { makeAuthenticatedGETRequest } from "@/lib/utils";
 
 const messages_data = [
   {
@@ -38,14 +39,32 @@ const messages_data = [
   },
 ];
 
-const Messages = () => {
+const Messages = ({ chats }) => {
+  console.log("chats from message page", chats);
+
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const msgId = pathname.split("/")[2];
+  const [messages, setMessages] = useState([]);
+  const userData = useAppSelector((state) => state.user.data);
+  console.log("userdata from messages page", userData);
+
+  const messagesFetch = async () => {
+    try {
+      const messages = await makeAuthenticatedGETRequest(
+        `/allmessages/${msgId}`
+      );
+      console.log("hello messages", messages);
+
+      setMessages(messages);
+    } catch (error) {
+      console.log("Error in fetching messages:", error.message);
+    }
+  };
 
   useEffect(() => {
-    dispatch(FetchMessages(msgId));
-  }, [dispatch, msgId]);
+    messagesFetch();
+  }, [msgId]);
 
   return (
     <div className="flex-grow h-full flex flex-col relative w-full">
@@ -73,11 +92,41 @@ const Messages = () => {
                 src="/img/no_profile.jpg"
                 alt=""
               />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>
+                {messages && messages?.chat?.users?.length > 0 ? (
+                  messages.chat.users.map((user) => {
+                    if (user._id !== userData._id) {
+                      return (
+                        <span key={user._id}>
+                          {user.username.substring(0, 2)}
+                        </span>
+                      );
+                    }
+                    return null; // Skip rendering if it's the logged-in user
+                  })
+                ) : (
+                  <span>No users found</span> // Fallback content when messages or users are empty
+                )}
+              </AvatarFallback>
             </Avatar>
           </div>
           <div className="flex-grow p-2">
-            <div className="text-md text-gray-50 font-semibold">John Doe</div>
+            <div className="text-md text-gray-50 font-semibold">
+              {messages &&
+              messages.chat &&
+              messages.chat.users &&
+              messages.chat.users.length > 0 ? (
+                messages.chat.users.map((user) => {
+                  if (user._id !== userData._id) {
+                    return <span key={user._id}>{user.username}</span>;
+                  }
+                  return null; // Skip rendering if it's the logged-in user
+                })
+              ) : (
+                <span>Loading...</span> // Fallback content when messages or users are empty or still loading
+              )}
+            </div>
+
             <div className="flex items-center">
               <div className="w-2 h-2 bg-green-300 rounded-full"></div>
               <div className="text-xs text-gray-50 ml-1">Online</div>
