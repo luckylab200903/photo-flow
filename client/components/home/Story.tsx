@@ -13,10 +13,7 @@ const Story = () => {
   const [stories, setStories] = useState([]);
   const fetchstories = async () => {
     try {
-      console.log("hello fgrons stories");
-      
       const response = await makeAuthenticatedGETRequest("/getallstories");
-      console.log("hello",response);
       setStories(response);
     } catch (error) {
       console.log("error in fetching stories", error.message);

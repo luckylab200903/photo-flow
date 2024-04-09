@@ -4,12 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
+import { getTimeFormat } from "@/lib/utils";
 
-const ConversationItem = ({ _id, image, time, name, message }) => {
+const ConversationItem = ({ data }) => {
   const pathname = usePathname();
-  const userId = pathname.split("/").pop();
+  const pathId = pathname.split("/").pop();
+  const _id = data._id;
+  const image = data.users[1].profilepicture;
+  const name = data.users[1].username;
+  const time = getTimeFormat(data.createdAt);
+  const message = data.latestMessage?.content;
+  const _class = pathId === _id ? "bg-gray" : "bg-white";
 
-  const _class = userId === _id ? "bg-gray" : "bg-white";
   return (
     <Link
       href={`/chat/${_id}`}

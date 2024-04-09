@@ -35,8 +35,6 @@ const AllPost = ({ className, socket }: { className: string; socket: any }) => {
           return;
         }
 
-        console.log("Posts data:", response);
-
         setPosts(response);
       } catch (error) {
         console.error("Error in getting the posts:", error.message);
@@ -90,11 +88,8 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
     const token = Cookies.get("token");
     if (token) {
       const decodedToken = jwtDecode(token);
-      console.log(decodedToken);
 
       const { identifier } = decodedToken;
-      setuserId(identifier);
-      console.log("user id from image selector", identifier);
       setuserId(identifier);
     }
   }, []);
@@ -116,7 +111,6 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
       try {
         if (userId) {
           const userData = await makeAuthenticatedGETRequest(`/user/${userId}`);
-          console.log("hello user", userData);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -180,8 +174,6 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
     setTextareaValue(event.target.value);
   };
   const handlecommentpost = async () => {
-    console.log(textareaValue);
-
     const body = {
       comment: textareaValue,
       userId,
@@ -190,7 +182,6 @@ const Post = ({ post, socket }: { post: any; socket: any }) => {
 
     try {
       const response = await makeAuthenticatedPOSTRequest("/addcomment", body);
-      console.log("Comment added successfully:", response);
       setTextareaValue("");
       //setCommentcount((prev) => prev + 1);
       socket.emit("comment", {

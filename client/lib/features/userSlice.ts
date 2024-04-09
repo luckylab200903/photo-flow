@@ -13,7 +13,7 @@ const initialState: userSliceState = {
     password: "",
     profilepicture: "",
     username: "",
-    posts: []
+    posts: [],
   },
 };
 

@@ -1,6 +1,7 @@
 import { AppDispatch } from "@/lib/store";
 import { conversationSlice, messagesSlice } from "@/lib/features/chatSlice";
 import { makeAuthenticatedGETRequest } from "@/lib/utils";
+import { useAppSelector } from "../hooks";
 
 export const FetchAllConversation = () => async (dispatch: AppDispatch) => {
   const { loadReq, loadSuccess, loadFail } = conversationSlice.actions;

@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { useAppSelector } from "../hooks";
 
 export const conversationSlice = createSlice({
   name: "conversation",
@@ -19,7 +20,6 @@ export const conversationSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-  
   },
 });
 
@@ -28,6 +28,7 @@ export const messagesSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
+    otherUser: null,
     data: [],
   },
   reducers: {

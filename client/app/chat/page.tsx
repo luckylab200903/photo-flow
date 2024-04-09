@@ -13,8 +13,9 @@ const Chat = () => {
   const conversation = useAppSelector((state) => state.conversation);
 
   useEffect(() => {
-    dispatch(FetchAllConversation());
+    if (conversation.data.length == 0) dispatch(FetchAllConversation());
   }, [dispatch]);
+  console.log(conversation.data);
 
   return (
     <div className="md:pl-20">

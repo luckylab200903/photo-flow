@@ -55,7 +55,7 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
 
       // Display image previews
       const previews: string[] = filesArray.map((file) =>
-        URL.createObjectURL(file)
+        URL.createObjectURL(file),
       );
       setImagePreview((prev: string[]) => [...prev, ...previews]);
     }
@@ -64,7 +64,7 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
   const getToken = () => {
     const accessToken = document.cookie.replace(
       /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
+      "$1",
     );
     return accessToken;
   };
@@ -72,11 +72,8 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
     const token = Cookies.get("token");
     if (token) {
       const decodedToken = jwtDecode(token);
-      console.log(decodedToken);
 
       const { identifier } = decodedToken;
-      setUserId(identifier);
-      console.log("user id from image selector", identifier);
       setUserId(identifier);
     }
   }, []);
@@ -98,7 +95,6 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
       try {
         if (userId) {
           const userData = await makeAuthenticatedGETRequest(`/user/${userId}`);
-          console.log(userData);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -123,14 +119,14 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
           {
             method: "POST",
             body: formData,
-          }
+          },
         );
         console.log(response);
 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(
-            `Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`
+            `Failed to upload image to Cloudinary. Status: ${response.status}. Error: ${errorText}`,
           );
         }
 
@@ -149,7 +145,7 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
       };
       const apiResponse = await makeAuthenticatedPOSTRequest(
         "/uploadstory",
-        data
+        data,
       );
       toast("story uploaded succesfully");
       console.log("API response:", apiResponse);
@@ -194,10 +190,10 @@ const StoryImageSelector = ({ children }: { children: React.ReactNode }) => {
                     <Button
                       onClick={() => {
                         setImagePreview((prev) =>
-                          prev.filter((str, id) => i != id)
+                          prev.filter((str, id) => i != id),
                         );
                         setImageFiles((prev) =>
-                          prev.filter((files, id) => i != id)
+                          prev.filter((files, id) => i != id),
                         );
                       }}
                       variant="ghost"

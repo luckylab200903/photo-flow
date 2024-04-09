@@ -4,67 +4,18 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { FetchMessages } from "@/lib/actions/chatActions";
 import { usePathname } from "next/navigation";
-import { makeAuthenticatedGETRequest } from "@/lib/utils";
 
-const messages_data = [
-  {
-    message: "Hello",
-    time: "1:00 PM",
-    type: "sent",
-  },
-  {
-    message: "Hi",
-    time: "1:00 PM",
-    type: "received",
-  },
-  {
-    message: "How are you?",
-    time: "1:00 PM",
-    type: "sent",
-  },
-  {
-    message: "I'm fine",
-    time: "1:00 PM",
-    type: "received",
-  },
-  {
-    message: "What are you doing?",
-    time: "1:00 PM",
-    type: "sent",
-  },
-  {
-    message: "I'm working",
-    time: "1:00 PM",
-    type: "received",
-  },
-];
-
-const Messages = ({ chats }) => {
-  console.log("chats from message page", chats);
-
+const Messages = ({}) => {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const msgId = pathname.split("/")[2];
-  const [messages, setMessages] = useState([]);
-  const userData = useAppSelector((state) => state.user.data);
-  console.log("userdata from messages page", userData);
-
-  const messagesFetch = async () => {
-    try {
-      const messages = await makeAuthenticatedGETRequest(
-        `/allmessages/${msgId}`
-      );
-      console.log("hello messages", messages);
-
-      setMessages(messages);
-    } catch (error) {
-      console.log("Error in fetching messages:", error.message);
-    }
-  };
+  const messages = useAppSelector((state) => state.messages.data);
+  const userId = useAppSelector((state) => state.user.data?._id);
 
   useEffect(() => {
-    messagesFetch();
-  }, [msgId]);
+    dispatch(FetchMessages(msgId));
+  }, [dispatch, msgId]);
+  console.log(messages, "messages");
 
   return (
     <div className="flex-grow h-full flex flex-col relative w-full">
@@ -92,22 +43,7 @@ const Messages = ({ chats }) => {
                 src="/img/no_profile.jpg"
                 alt=""
               />
-              <AvatarFallback>
-                {messages && messages?.chat?.users?.length > 0 ? (
-                  messages.chat.users.map((user) => {
-                    if (user._id !== userData._id) {
-                      return (
-                        <span key={user._id}>
-                          {user.username.substring(0, 2)}
-                        </span>
-                      );
-                    }
-                    return null; // Skip rendering if it's the logged-in user
-                  })
-                ) : (
-                  <span>No users found</span> // Fallback content when messages or users are empty
-                )}
-              </AvatarFallback>
+              <AvatarFallback>H</AvatarFallback>
             </Avatar>
           </div>
           <div className="flex-grow p-2">
@@ -151,12 +87,12 @@ const Messages = ({ chats }) => {
         </div>
       </div>
       <div className="">
-        {messages_data.map((message, index) => {
-          if (message.type === "sent") {
+        {messages.map((message, index) => {
+          if (message.sender._id === userId) {
             return (
               <div key={index} className="flex justify-end p-2">
                 <div className="bg-surface text-light p-2 rounded-md rounded-tr-none">
-                  {message.message}
+                  {message.content}
                 </div>
               </div>
             );
@@ -164,7 +100,7 @@ const Messages = ({ chats }) => {
             return (
               <div key={index} className="flex p-2">
                 <div className="bg-overlay text-surface p-2 rounded-md rounded-tl-none">
-                  {message.message}
+                  {message.content}
                 </div>
               </div>
             );

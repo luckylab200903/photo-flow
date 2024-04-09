@@ -12,10 +12,9 @@ const Chat = () => {
   const pathname = usePathname();
 
   const conversation = useAppSelector((state) => state.conversation);
-  console.log("conversation from userid page",conversation);
-  
+
   useEffect(() => {
-    dispatch(FetchAllConversation());
+    if (conversation.data.length == 0) dispatch(FetchAllConversation());
   }, [dispatch]);
 
   return (
@@ -53,7 +52,7 @@ const Chat = () => {
           </div>
         </div>
         <div className="flex-grow  h-screen p-2 rounded-md">
-          <Messages chats={conversation.data}/>
+          <Messages chats={conversation.data} />
         </div>
       </div>
     </div>
