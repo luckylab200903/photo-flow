@@ -50,30 +50,32 @@ const server = app.listen(process.env.PORT || 5000, () => {
   connectToMongoDB(process.env.MONGO_URI);
 });
 
-const io = new Server(server, {
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
   },
 });
-// Assuming you have functions to handle likes and comments
-const handleLike = (postId, userId) => {
-  // Logic to handle like
-  // Emit Socket.io event
-  io.emit('like', { postId, userId });
-};
-
-const handleComment = (postId, userId) => {
-  // Logic to handle comment
-  // Emit Socket.io event
-  io.emit('comment', { postId, userId });
-};
 
 io.on("connection", (socket) => {
-  //console.log(socket);
-  //console.log("someone has connected");
-  //io.emit("firstevent"," hello this is keshav kumar singh from socket io")
-  socket.on("disconnect", () => {
-    console.log("someone has disconnected");
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+    console.log(userData._id);
+    socket.emit("connected");
+  });
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("room ka log hu mai", room);
+    console.log(`User joined room ${room}`);
+  });
+  socket.on("new message", (newMessageRecieced) => {
+    var chat = newMessageRecieced.chat;
+    if (!chat.users) {
+      return console.log("chat users not defined");
+    }
+    chat.users.forEach((user) => {
+      if (user._id === newMessageRecieced.sender._id) return;
+      socket.in(user._id).emit("message recieved", newMessageRecieced);
+    });
   });
 });
-

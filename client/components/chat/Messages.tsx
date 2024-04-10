@@ -4,19 +4,70 @@ import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { FetchMessages } from "@/lib/actions/chatActions";
 import { usePathname } from "next/navigation";
-
+import { makeAuthenticatedPOSTRequest } from "@/lib/utils";
+import { io } from "socket.io-client";
+const endpoint = "http://localhost:5001";
+var socket;
 const Messages = ({}) => {
   const dispatch = useAppDispatch();
   const pathname = usePathname();
   const msgId = pathname.split("/")[2];
   const messages = useAppSelector((state) => state.messages.data);
   const userId = useAppSelector((state) => state.user.data?._id);
+  const userData = useAppSelector((state) => state.user.data);
+  console.log("userData from message page", userData);
 
+  const [messageinput, setMessageinput] = useState("");
+  const [socketconnected, setsocketconnected] = useState(false);
+  useEffect(() => {
+    socket = io(endpoint);
+    console.log(socket);
+    socket.emit("setup", userData);
+    socket.on("connection", () => {
+      setsocketconnected(true);
+    });
+    // socket.on("connect", () => {
+    //   socket.emit("joinRoom", msgId);
+    //   setSocketConnected(true);
+    // })
+  }, []);
   useEffect(() => {
     dispatch(FetchMessages(msgId));
-  }, [dispatch, msgId]);
-  console.log(messages, "messages");
+    socket = io(endpoint);
+    socket.on("connect", () => {
+      socket.emit("join chat", msgId);
+      setsocketconnected(true);
+    });
+  }, [dispatch, msgId, socket]);
 
+  // useEffect(() => {
+  //   socket.on("message recieved", (newMessageRecieved) => {
+  //     if (msgId !== newMessageRecieved.chat._id) {
+
+  //     }
+  //     else{
+
+  //     }
+  //   });
+  // });
+  const sendMessagePostRequest = async () => {
+    try {
+      const response = await makeAuthenticatedPOSTRequest("/sendmessage", {
+        chatId: msgId,
+        content: messageinput,
+      });
+      console.log(response);
+  
+      dispatch(FetchMessages(msgId));
+    
+      setMessageinput("");
+      socket.emit("newMessage",response)
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  
   return (
     <div className="flex-grow h-full flex flex-col relative w-full">
       <div className="w-full h-15 p-1">
@@ -129,15 +180,21 @@ const Messages = ({}) => {
             <input
               className="input text-gray-700 text-sm p-5 focus:outline-none bg-gray-100 w-full md:w-[70%] rounded-l-md"
               type="text"
+              value={messageinput}
+              onChange={(e) => {
+                console.log(messageinput);
+                setMessageinput(e.target.value);
+              }}
               placeholder="Type your message ..."
             />
-            <div className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200  flex justify-center items-center pr-3 text-gray-400 rounded-r-md">
+            <div className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200  flex justify-center items-center pr-3 text-gray-400 rounded-r-md hover:cursor-pointer">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                onClick={sendMessagePostRequest}
               >
                 <path
                   strokeLinecap="round"

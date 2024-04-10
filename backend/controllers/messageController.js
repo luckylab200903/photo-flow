@@ -36,14 +36,12 @@ const sendmessage = expressAsyncHandler(async (req, res) => {
 const allMessages = expressAsyncHandler(async (req, res) => {
   try {
     const { messageId } = req.params;
-    console.log(messageId)
+    console.log(messageId);
     const messages = await Message.find({
       chat: messageId,
     })
       .populate("sender", "name email profilepicture username")
       .populate("chat");
-
-      console.log(messages)
     res.json(messages);
   } catch (error) {
     res.status(400);
@@ -69,7 +67,6 @@ const updateMessage = expressAsyncHandler(async (req, res) => {
   const { messageId, newMessage } = req.body;
 
   try {
-
     const message = await Message.findById(messageId);
 
     if (!message) {
